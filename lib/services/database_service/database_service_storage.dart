@@ -20,13 +20,15 @@ class DatabaseServiceStorage extends StorageService {
     WidgetsFlutterBinding.ensureInitialized();
     databaseFactory = databaseFactoryFfi;
     var databasesPath = await getApplicationDocumentsDirectory();
-    var path = p.join(Directory.current.path, 'assets/db.sqlite');
+    // var path = p.join(Directory.current.path, 'assets/db.sqlite');
+    var path = p.join(databasesPath.path, 'db.sqlite');
     var exists = await databaseFactory.databaseExists(path);
     print(exists);
     db = await databaseFactory.openDatabase(path);
     // db.getVersion().then((value){});
     if (exists == false) {
       _pProvider.createDb(path);
+      await createTables();
     } else {
       _path = path;
       await createTables();
@@ -34,7 +36,6 @@ class DatabaseServiceStorage extends StorageService {
   }
 
   Future<void> createTables() async {
-   
     await db.execute('''
       CREATE TABLE if not exists product (
         id INTEGER PRIMARY KEY,

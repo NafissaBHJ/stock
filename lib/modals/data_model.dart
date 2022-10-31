@@ -1,10 +1,12 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as m;
+import 'package:intl/intl.dart';
 
 import 'package:sqflite/sqflite.dart';
 
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:win_toast/win_toast.dart';
 
 class Product {
   int? id;
@@ -19,6 +21,7 @@ class Product {
   int quantite;
   int nbTest;
   bool? rest;
+  bool? perom;
   String dateAchat;
   String datePerom;
 
@@ -91,7 +94,43 @@ class Product {
 
   bool calculeRest() {
     rest = (quantite - nbTest) > seuil ? false : true;
+
+    if (rest == true) {
+      notification(product);
+    }
+    VerificationDate();
     return rest!;
+  }
+
+  void VerificationDate() {
+    perom = false;
+    var dateTime1 = DateTime.now();
+    var dateTime2 =
+        DateFormat('d/MM/y').parse(datePerom).subtract(Duration(days: 30));
+    if ((dateTime1.day == dateTime2.day) &&
+        (dateTime1.month == dateTime2.month) &&
+        (dateTime1.year == dateTime2.year)) {
+      perom = true;
+    } else {
+      perom = false;
+    }
+    if (perom == true) {
+      notificationDate(product);
+    }
+  }
+
+  Future<void> notification(String name) async {
+    final toast = await WinToast.instance().showToast(
+        type: ToastType.text01,
+        title: "Le seuil de notification est atteint  pour le produit $name!");
+    assert(toast != null);
+  }
+
+  Future<void> notificationDate(String name) async {
+    final toast = await WinToast.instance().showToast(
+        type: ToastType.text01,
+        title: "La Date de Péremption pour le produit $name est Proche !");
+    assert(toast != null);
   }
 }
 
@@ -160,6 +199,7 @@ class ProductDataSource extends m.DataTableSource {
   @override
   m.DataRow? getRow(int index) {
     final row = list[index];
+
     return DataRow2(
         color: row.calculeRest() == true
             ? m.MaterialStateProperty.all<Color>(Colors.red.lightest)

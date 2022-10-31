@@ -2,7 +2,13 @@
 
 A windows app  for stock management.
 
+- Add Products to local database
 
+- Manage Products
+
+- Get notification when threshold is reached
+
+- Get notifications when Expired date is near
 
 ## What it is about ?
 

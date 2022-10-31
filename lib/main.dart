@@ -16,11 +16,11 @@ class MyApp extends StatelessWidget {
     return FluentApp(
       debugShowCheckedModeBanner: false,
       title: "Stock",
+ 
       theme: SystemTheme.isDarkMode
           ? CustomDarkTheme(context)
           : CustomLightTheme(context),
       routes: {"/": ((context) => MyHomePage())},
-      
     );
   }
 }

@@ -51,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
           pane: stateManager.homeNotifier.value.state == true
               ? NavigationPane(
                   header: const Text("Menu"),
-                  size:const NavigationPaneSize(openWidth: 200),
+                  size: const NavigationPaneSize(openWidth: 200),
                   indicator: const StickyNavigationIndicator(
                     color: Colors.transparent,
                   ),
@@ -155,9 +155,9 @@ class LoginWidget extends StatelessWidget {
               ),
             ),
             tint: Colors.transparent,
-            tintAlpha: 0.6,
-            luminosityAlpha: 0.7,
-            blurAmount: 80,
+            tintAlpha: 0.2,
+            luminosityAlpha: 0.2,
+            blurAmount: 50,
             elevation: 10,
           ),
         );

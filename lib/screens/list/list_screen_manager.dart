@@ -18,12 +18,7 @@ class ListManager {
     dataNotifier.deleteData(id);
   }
 
-  Future<void> notification() async {
-    final toast = await WinToast.instance().showToast(
-        type: ToastType.text01,
-        title: "Le seuil de notification est atteint !");
-    assert(toast != null);
-  }
+
 
   void search(String product) {
     print(product);

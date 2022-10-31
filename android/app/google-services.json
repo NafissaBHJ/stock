@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "939351255348",
+    "project_id": "otptest-967c2",
+    "storage_bucket": "otptest-967c2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:939351255348:android:5a8888290602694f0c1d61",
+        "android_client_info": {
+          "package_name": "com.example.molahada"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "939351255348-8varbfqqgkc3qc1d59602bb11d6f3q19.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBO6a2socwM8InY6ABLz4SV6wLOaWR-J8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "939351255348-8varbfqqgkc3qc1d59602bb11d6f3q19.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

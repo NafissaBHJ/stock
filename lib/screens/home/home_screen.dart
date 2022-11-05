@@ -55,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   indicator: const StickyNavigationIndicator(
                     color: Colors.transparent,
                   ),
-                  displayMode: PaneDisplayMode.compact,
+                  displayMode: PaneDisplayMode.open,
                   selected: value.index,
                   onChanged: ((val) {
                     stateManager.updateIndex(val);

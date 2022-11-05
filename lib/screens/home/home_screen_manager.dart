@@ -10,6 +10,7 @@ class HomeManager {
   final homeNotifier = ValueNotifier<Home>(Home(index: 0, state: false));
   final loggedNotifier = ValueNotifier<bool>(true);
   final storageService = getIt<StorageService>();
+  int? u;
 
   void updateIndex(int v) {
     homeNotifier.value.index = v;
@@ -27,9 +28,12 @@ class HomeManager {
     updateLoginNotifier(false);
     User? user = await storageService.getAdmin(username, password);
     if (user != null) {
+      print('user ${user.id}');
+      await storageService.setUser(user.id!);
+      u = await storageService.getUserP();
+      print("uuuuuuuuuuuu $u");
       homeNotifier.value.state = true;
       homeNotifier.notifyListeners();
-
     } else {
       updateLoginNotifier(true);
     }

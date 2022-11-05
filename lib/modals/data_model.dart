@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:data_table_2/data_table_2.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as m;
@@ -8,11 +10,14 @@ import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:win_toast/win_toast.dart';
 
+import '../services/database_service/storage_service.dart';
+import '../services/service_locator.dart';
+
 class Product {
   int? id;
   String product;
   String fournisseur;
-  String employe;
+  String? employe;
   int seuil;
   int prixTTC;
   int prixHT;
@@ -22,6 +27,7 @@ class Product {
   int nbTest;
   bool? rest;
   bool? perom;
+  int period;
   String dateAchat;
   String datePerom;
 
@@ -35,7 +41,7 @@ class Product {
       required this.remise,
       required this.quantite,
       required this.nbTest,
-      required this.employe,
+      required this.period,
       required this.seuil,
       required this.dateAchat,
       required this.datePerom});
@@ -50,7 +56,8 @@ class Product {
       "tva": prixTVA,
       "remise": remise,
       "ttc": prixTTC,
-      "user": employe,
+      "user": employe ?? "Admin",
+      "period": period,
       "seuil": seuil,
       "date_achat": dateAchat,
       "date_peromp": datePerom
@@ -71,7 +78,7 @@ class Product {
       prixTVA: map['tva'],
       quantite: map['quantite'],
       remise: map['remise'],
-      employe: map['user'],
+      period: map['period'] ?? 0,
       seuil: map['seuil'],
     );
   }
@@ -85,7 +92,7 @@ class Product {
   }
 
   String refactorTVA() {
-    return prixTVA.toDouble().toString();
+    return prixTVA.toString() + " %";
   }
 
   String refactorRemise() {
@@ -93,7 +100,7 @@ class Product {
   }
 
   bool calculeRest() {
-    rest = (quantite - nbTest) > seuil ? false : true;
+    rest = quantite > seuil ? false : true;
 
     if (rest == true) {
       notification(product);
@@ -106,7 +113,8 @@ class Product {
     perom = false;
     var dateTime1 = DateTime.now();
     var dateTime2 =
-        DateFormat('d/MM/y').parse(datePerom).subtract(Duration(days: 30));
+        DateFormat('d/MM/y').parse(datePerom).subtract(Duration(days: period));
+
     if ((dateTime1.day == dateTime2.day) &&
         (dateTime1.month == dateTime2.month) &&
         (dateTime1.year == dateTime2.year)) {
@@ -156,7 +164,9 @@ class ProductProvider {
     databaseFactory = databaseFactoryFfi;
     print(path);
     db = await databaseFactory.openDatabase(path);
+
     var products = await db.query('product');
+
     await db.close();
 
     return List<Product>.from(products.map((e) => Product.fromMap(e)).toList());
@@ -190,21 +200,34 @@ class ProductDataSource extends m.DataTableSource {
   ProductDataSource(
       {required List<Product> productList,
       required this.update,
-      required this.delete})
+      required this.delete,
+      required this.take,
+      required this.history,
+      required this.value})
       : list = productList;
 
   List<Product> list;
   final OnRowSelect update;
   final OnRowSelect delete;
+  final OnRowSelect take;
+  final OnRowSelect history;
+  final int value;
+  final storage = getIt<StorageService>();
+
   @override
   m.DataRow? getRow(int index) {
     final row = list[index];
 
+    return RowMethod(row, index);
+  }
+
+  DataRow2 RowMethod(Product row, int index) {
+    print(index);
     return DataRow2(
         color: row.calculeRest() == true
             ? m.MaterialStateProperty.all<Color>(Colors.red.lightest)
             : null,
-        specificRowHeight: 80,
+        specificRowHeight: 100,
         cells: [
           m.DataCell(Text(row.product)),
           m.DataCell(Text(row.fournisseur)),
@@ -217,23 +240,37 @@ class ProductDataSource extends m.DataTableSource {
           m.DataCell(Text(
             row.seuil.toString(),
           )),
-          m.DataCell(Text(row.employe)),
           m.DataCell(Text(row.dateAchat)),
           m.DataCell(Text(row.datePerom)),
           m.DataCell(Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Button(
-                child: const Text(
-                  "Modifier",
-                ),
-                onPressed: () => update(index),
-              ),
-              Button(
-                child: const Text("Delete"),
-                onPressed: () => delete(index),
-              )
-            ],
+            children: value == 1
+                ? [
+                    Button(
+                      child: const Text(
+                        "Modifier",
+                      ),
+                      onPressed: () => update(index),
+                    ),
+                    Button(
+                      child: const Text(
+                        "Historique",
+                      ),
+                      onPressed: () => history(index),
+                    ),
+                    Button(
+                      child: const Text("Supprimer"),
+                      onPressed: () => delete(index),
+                    )
+                  ]
+                : [
+                    Button(
+                      child: const Text(
+                        "Consommer",
+                      ),
+                      onPressed: () => take(index),
+                    ),
+                  ],
           ))
         ]);
   }

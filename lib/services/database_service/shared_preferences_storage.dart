@@ -1,18 +1,19 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stock/services/database_service/storage_service.dart';
 
-import '../../modals/user_model.dart';
-
 class SharedPreferenceStorage extends StorageService {
   @override
-  Future<void> setUser(bool state) async {
+  Future<void> setUser(int state) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setBool("logged_in", state);
+    prefs.setInt("user_id", state);
   }
 
   @override
-  Future<bool> getUser() async {
+  Future<int?> getUserP() async {
+    late int id;
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool("logged_in") ?? false;
+    id = prefs.getInt("user_id")!;
+    print("eeeeeeeeeeeeeeeeeeee$id");
+    return id;
   }
 }

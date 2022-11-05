@@ -5,7 +5,6 @@ import '../screens/form/form_screen_manager.dart';
 import '../screens/list/list_screen_manager.dart';
 import 'database_service/database_service_storage.dart';
 import 'database_service/storage_service.dart';
-import '../screens/notes/mynotes_page_logic.dart';
 
 final getIt = GetIt.instance;
 
@@ -13,6 +12,5 @@ void setupGetIt() {
   getIt.registerLazySingleton<HomeManager>(() => HomeManager());
   getIt.registerLazySingleton<ListManager>(() => ListManager());
   getIt.registerLazySingleton<FormManager>(() => FormManager());
-  getIt.registerLazySingleton<MyNotesPageManager>(() => MyNotesPageManager());
   getIt.registerLazySingleton<StorageService>(() => DatabaseServiceStorage());
 }

@@ -6,14 +6,14 @@ class User {
   String username;
   String password;
 
-  User({required this.username, required this.password});
+  User({this.id,required this.username, required this.password});
   Map<String, Object?> toMap() {
     var map = <String, Object?>{"username": username, "password": password};
     return map;
   }
 
   factory User.fromMap(dynamic map) {
-    return User(password: map['password'], username: map['username']);
+    return User(id:map['id'],password: map['password'], username: map['username']);
   }
 }
 
@@ -41,7 +41,7 @@ class UserProvider {
     User? u;
     List user = await db.rawQuery(
         'SELECT * FROM user WHERE username=? AND password=?', [username, pass]);
-    print(user.isNotEmpty);
+  
     if (user.isNotEmpty) {
       u = List<User>.from(user.map((e) => User.fromMap(e)).toList()).first;
     }

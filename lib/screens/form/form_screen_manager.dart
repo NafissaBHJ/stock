@@ -2,17 +2,29 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:stock/modals/data_model.dart';
 import 'package:stock/screens/notifiers/product_notifier.dart';
+import 'package:stock/services/database_service/storage_service.dart';
+
+import '../../services/service_locator.dart';
 
 class FormManager {
   final couunterNotifier = ValueNotifier<int>(0);
   final timePickerNotifier = ValueNotifier<DateTime>(DateTime.now());
   final productNotofier = ProductNotifier();
+  final userNotifer = ValueNotifier<int?>(0);
+  final storage = getIt<StorageService>();
+  final ttcNotifier = ValueNotifier<int>(0);
+
   DateTime time1 = DateTime.now();
   DateTime time2 = DateTime.now();
   int v = 0;
+  int? tva;
+  int? prix;
 
   Future<void> init() async {
     await productNotofier.initialize();
+    userNotifer.value = await storage.getUserP();
+    userNotifer.notifyListeners();
+    print(userNotifer.value);
   }
 
   String incrementCounter(String val) {
@@ -56,8 +68,17 @@ class FormManager {
     timePickerNotifier.value = time;
   }
 
-  void InsertProduct(String product, String fournisseur, String seuil,String employe,String quantite,
-      String nbTest, String ttc, String ht, String tva, String remise) {
+  void InsertProduct(
+      String product,
+      String fournisseur,
+      String seuil,
+      String period,
+      String quantite,
+      String nbTest,
+      String ttc,
+      String ht,
+      String tva,
+      String remise) {
     Product p = Product(
         product: product,
         fournisseur: fournisseur,
@@ -68,7 +89,16 @@ class FormManager {
         dateAchat: DateFormat.yMd('fr').format(time1),
         datePerom: DateFormat.yMd('fr').format(time2),
         nbTest: int.parse(nbTest),
-        quantite: int.parse(quantite), employe: employe, seuil: int.parse(seuil));
+        quantite: int.parse(quantite),
+        period: int.parse(period),
+        seuil: int.parse(seuil));
     productNotofier.add(p);
+  }
+
+  void calculeTTC() {
+    int ttc =( prix! + (1 + (tva! / 100))).toInt();
+    ttcNotifier.value = ttc;
+    ttcNotifier.notifyListeners();
+    print(ttc);
   }
 }

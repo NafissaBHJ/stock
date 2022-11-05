@@ -4,7 +4,9 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:stock/modals/history_model.dart';
 import 'package:stock/modals/user_model.dart';
+import 'package:stock/services/database_service/shared_preferences_storage.dart';
 
 import '../../modals/data_model.dart';
 import 'storage_service.dart';
@@ -12,6 +14,7 @@ import 'storage_service.dart';
 class DatabaseServiceStorage extends StorageService {
   final _pProvider = ProductProvider();
   final userProvider = UserProvider();
+  final historyProvider = HistoryProvider();
   String _path = "";
   var databaseFactory, db;
   @override
@@ -25,6 +28,7 @@ class DatabaseServiceStorage extends StorageService {
     var exists = await databaseFactory.databaseExists(path);
     print(exists);
     db = await databaseFactory.openDatabase(path);
+
     // db.getVersion().then((value){});
     if (exists == false) {
       _pProvider.createDb(path);
@@ -36,6 +40,8 @@ class DatabaseServiceStorage extends StorageService {
   }
 
   Future<void> createTables() async {
+    await db.execute('PRAGMA foreign_keys = ON');
+
     await db.execute('''
       CREATE TABLE if not exists product (
         id INTEGER PRIMARY KEY,
@@ -50,7 +56,17 @@ class DatabaseServiceStorage extends StorageService {
         remise INTEGER,
         ttc INTEGER,
         date_achat TEXT,
-        date_peromp TEXT 
+        date_peromp TEXT,
+        period INTEGER NULL 
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE if not exists history(
+        id INTEGER PRIMARY KEY,
+        user TEXT,
+        quantite INTEGER,
+        product_id INTEGER REFERENCES product(id),
+        date TEXT
       )
     ''');
     await db.execute('''
@@ -62,25 +78,17 @@ class DatabaseServiceStorage extends StorageService {
     ''');
 
     List notes = await db.query('user');
+    // print(notes);
     if (notes.isEmpty) {
       db.rawInsert('INSERT INTO user(username, password) VALUES(?, ?)',
           ["admin", "123aze"]);
     }
   }
 
-/*   Future<List<Note>> getNotesRecords(String path) async {
-    await databaseFactory.openDatabase(path);
-    var notes = await db.query('Note');
-    print(notes);
-    List<Note> list = notes.map((e) => Note.fromMap(e)).toList();
-    await db.close();
-    return list;
-  }
- */
   @override
   Future<List<dynamic>> getRecord() async {
     List<Product>? products = (await _pProvider.getAllProducts(_path));
-    print("here $products");
+
     return products;
   }
 
@@ -98,10 +106,34 @@ class DatabaseServiceStorage extends StorageService {
   @override
   Future<void> delete(id) async {
     await _pProvider.deleteProduct(id, _path);
+    await historyProvider.deleteProductHistory(id, _path);
   }
 
   Future<User?> getAdmin(String u, String p) async {
     User? user = await userProvider.getUser(_path, u, p);
     return user;
+  }
+
+  @override
+  Future<void> setUser(int state) async {
+    SharedPreferenceStorage().setUser(state);
+  }
+
+  @override
+  Future<int?> getUserP() {
+    return SharedPreferenceStorage().getUserP();
+  }
+
+  @override
+  Future<void> updateHistory(History h, int id, int productQ) async {
+    await historyProvider.insertHistory(h, _path);
+    await historyProvider.updateProduct(_path, id, productQ);
+  }
+
+  @override
+  Future<List<History>?> getHistory(int id) async {
+    List<History>? hList = await historyProvider.getHistory(id, _path);
+
+    return hList;
   }
 }

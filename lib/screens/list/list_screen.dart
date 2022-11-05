@@ -5,6 +5,7 @@ import 'package:stock/screens/list/list_screen_manager.dart';
 import 'package:stock/services/service_locator.dart';
 
 import '../../modals/data_model.dart';
+import '../../modals/history_model.dart';
 
 class ListScreen extends StatefulWidget {
   ListScreen({Key? key}) : super(key: key);
@@ -29,8 +30,15 @@ class _ListScreenState extends State<ListScreen> {
         builder: ((context, value, child) {
           material.DataTableSource source = ProductDataSource(
               productList: value,
+              value: stateManager.dataNotifier.idNotifier.value!,
               update: (index) => modify(context, value[index]),
-              delete: ((index) => delete(context, value[index])));
+              delete: ((index) => delete(context, value[index])),
+              history: ((index) {
+                print(value[index].id!);
+                stateManager.getHistory(value[index].id!);
+                history(context, value[index]);
+              }),
+              take: (index) => take(context, value[index]));
           return SizedBox(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
@@ -83,9 +91,6 @@ class _ListScreenState extends State<ListScreen> {
                           label: Text('Seuil'),
                           size: ColumnSize.S,
                           numeric: true,
-                        ),
-                        DataColumn2(
-                          label: Text('Admin'),
                         ),
                         DataColumn2(
                           label: Text('Date d\'achat'),
@@ -162,6 +167,103 @@ class _ListScreenState extends State<ListScreen> {
             ],
           );
         }));
+  }
+
+  take(BuildContext context, Product p) async {
+    var stateManager = getIt<ListManager>();
+    var c1 = TextEditingController();
+    var c2 = TextEditingController();
+    return await showDialog<String>(
+        context: context,
+        builder: ((context) {
+          return ContentDialog(
+            title: const Text("Consommation"),
+            content: SizedBox(
+              height: 200,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text("${p.product}  /  ${p.fournisseur}"),
+                  TextBox(
+                    header: "Quantité",
+                    controller: c1,
+                  ),
+                  TextBox(
+                    header: "Votre nom",
+                    controller: c2,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: (() {
+                    stateManager.saveHistory(p, c1.text, c2.text);
+                    Navigator.pop(context);
+                  }),
+                  child: const Text("Enregister"))
+            ],
+          );
+        }),
+        barrierDismissible: true);
+  }
+
+  history(BuildContext context, Product p) async {
+    var stateManager = getIt<ListManager>();
+
+    return await showDialog<String>(
+        context: context,
+        builder: ((context) {
+          return ValueListenableBuilder<List<History>>(
+            builder: (BuildContext context, value, Widget? child) {
+              return ContentDialog(
+                title: const Text("Historique"),
+                content: SizedBox(
+                  width: 500,
+                  height: 200,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: const [
+                            Text("Name"),
+                            Text("Quantite"),
+                            Text("Date")
+                          ],
+                        ),
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            mainAxisSize: MainAxisSize.min,
+                            children: value
+                                .map((e) => Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Text(e.name!),
+                                        Text(e.quantite.toString()),
+                                        Text(e.date!)
+                                      ],
+                                    ))
+                                .toList()),
+                      ],
+                    ),
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: (() {
+                        Navigator.pop(context);
+                      }),
+                      child: const Text("Fermer"))
+                ],
+              );
+            },
+            valueListenable: stateManager.historyNotifier,
+          );
+        }),
+        barrierDismissible: true);
   }
 }
 

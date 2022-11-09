@@ -1,5 +1,6 @@
 class Home {
   int index;
   bool state;
-  Home({required this.index, required this.state});
+  int? userId;
+  Home({required this.index, required this.state,this.userId});
 }

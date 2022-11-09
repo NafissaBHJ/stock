@@ -19,11 +19,14 @@ class Product {
   String fournisseur;
   String? employe;
   int seuil;
-  int prixTTC;
+  int prixTTCu;
+  int prixTTCt;
+  int fusion;
   int prixHT;
   int prixTVA;
-  int remise;
+  int? remise;
   int quantite;
+  int remain;
   int nbTest;
   bool? rest;
   bool? perom;
@@ -35,11 +38,14 @@ class Product {
       {this.id,
       required this.product,
       required this.fournisseur,
-      required this.prixTTC,
+      required this.prixTTCu,
+      required this.prixTTCt,
+      required this.fusion,
       required this.prixHT,
       required this.prixTVA,
-      required this.remise,
+      this.remise,
       required this.quantite,
+      required this.remain,
       required this.nbTest,
       required this.period,
       required this.seuil,
@@ -51,11 +57,14 @@ class Product {
       "produit": product,
       "fournisseur": fournisseur,
       "quantite": quantite,
+      "rest": remain,
       "nb_test": nbTest,
       "ht": prixHT,
       "tva": prixTVA,
-      "remise": remise,
-      "ttc": prixTTC,
+      "remise": remise ?? 0,
+      "ttcu": prixTTCu,
+      "ttct": prixTTCt,
+      "fusion": fusion,
       "user": employe ?? "Admin",
       "period": period,
       "seuil": seuil,
@@ -74,10 +83,13 @@ class Product {
       datePerom: map['date_peromp'],
       nbTest: map['nb_test'],
       prixHT: map['ht'],
-      prixTTC: map['ttc'],
+      prixTTCu: map['ttcu'],
+      prixTTCt: map['ttct'],
+      fusion: map['fusion'],
       prixTVA: map['tva'],
       quantite: map['quantite'],
-      remise: map['remise'],
+      remain: map['rest'],
+      remise: map['remise'] ?? 0,
       period: map['period'] ?? 0,
       seuil: map['seuil'],
     );
@@ -87,8 +99,12 @@ class Product {
     return prixHT.toDouble().toString();
   }
 
-  String refactorTTC() {
-    return prixTTC.toDouble().toString();
+  String refactorTTCt() {
+    return prixTTCt.toDouble().toString();
+  }
+
+  String refactorTTCu() {
+    return prixTTCu.toDouble().toString();
   }
 
   String refactorTVA() {
@@ -96,11 +112,11 @@ class Product {
   }
 
   String refactorRemise() {
-    return remise.toDouble().toString();
+    return remise!.toString() + " %";
   }
 
   bool calculeRest() {
-    rest = quantite > seuil ? false : true;
+    rest = remain > seuil ? false : true;
 
     if (rest == true) {
       notification(product);
@@ -165,23 +181,22 @@ class ProductProvider {
     print(path);
     db = await databaseFactory.openDatabase(path);
 
-    var products = await db.query('product');
+    var products =
+        await db.rawQuery('SELECT * from product ORDER BY produit ASC');
 
     await db.close();
 
     return List<Product>.from(products.map((e) => Product.fromMap(e)).toList());
   }
 
-  Future<void> updateProduct(
-      String path, int id, int quantite, int tests) async {
+  Future<void> updateProduct(String path, int id, Product p) async {
     databaseFactory = databaseFactoryFfi;
-    print(path);
     db = await databaseFactory.openDatabase(path);
-    int row = await db.rawUpdate('''
-    UPDATE product 
-    SET quantite = ?, nb_test = ? 
-    WHERE id = ?
-    ''', [quantite, tests, id]);
+    var value = p.toMap();
+    print(value);
+    print(id);
+    int row =
+        await db.update("product", value, where: 'id = ?', whereArgs: [id]);
     print(row);
     await db.close();
   }
@@ -230,12 +245,13 @@ class ProductDataSource extends m.DataTableSource {
         specificRowHeight: 100,
         cells: [
           m.DataCell(Text(row.product)),
-          m.DataCell(Text(row.fournisseur)),
           m.DataCell(Text((row.quantite).toString())),
+          m.DataCell(Text((row.remain).toString())),
           m.DataCell(Text(row.nbTest.toString())),
           m.DataCell(Text(row.refactorHT())),
           m.DataCell(Text(row.refactorTVA())),
-          m.DataCell(Text(row.refactorTTC())),
+          m.DataCell(Text(row.refactorTTCu())),
+          m.DataCell(Text(row.refactorTTCt())),
           m.DataCell(Text(row.refactorRemise())),
           m.DataCell(Text(
             row.seuil.toString(),

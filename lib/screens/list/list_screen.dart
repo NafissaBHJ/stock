@@ -1,6 +1,7 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
+import 'package:stock/screens/form/form_screen.dart';
 import 'package:stock/screens/list/list_screen_manager.dart';
 import 'package:stock/services/service_locator.dart';
 
@@ -34,7 +35,7 @@ class _ListScreenState extends State<ListScreen> {
               update: (index) => modify(context, value[index]),
               delete: ((index) => delete(context, value[index])),
               history: ((index) {
-                print(value[index].id!);
+                print("iiiddd ${value[index].id!}");
                 stateManager.getHistory(value[index].id!);
                 history(context, value[index]);
               }),
@@ -60,14 +61,17 @@ class _ListScreenState extends State<ListScreen> {
                           label: Text('Produit'),
                         ),
                         DataColumn2(
-                            label: Text('Fournisseur'), size: ColumnSize.M),
-                        DataColumn2(
                           label: Text('Quantité'),
                           size: ColumnSize.S,
                           numeric: true,
                         ),
                         DataColumn2(
-                          label: Text('Numbre test'),
+                          label: Text('Q Rest'),
+                          size: ColumnSize.S,
+                          numeric: true,
+                        ),
+                        DataColumn2(
+                          label: Text('Nombre test'),
                           size: ColumnSize.S,
                           numeric: true,
                         ),
@@ -76,11 +80,15 @@ class _ListScreenState extends State<ListScreen> {
                           numeric: true,
                         ),
                         DataColumn2(
-                          label: Text('Prix TVA'),
+                          label: Text('TVA'),
                           numeric: true,
                         ),
                         DataColumn2(
-                          label: Text('Prix TTC'),
+                          label: Text('Prix U TTC'),
+                          numeric: true,
+                        ),
+                        DataColumn2(
+                          label: Text('Prix T TTC'),
                           numeric: true,
                         ),
                         DataColumn2(
@@ -121,30 +129,19 @@ class _ListScreenState extends State<ListScreen> {
           return ContentDialog(
             title: const Text("Modification"),
             content: SizedBox(
-              height: 200,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text("${p.product}  /  ${p.fournisseur}"),
-                  TextBox(
-                    header: "Quantité",
-                    controller: c1,
-                  ),
-                  TextBox(
-                    header: "Nombre de test",
-                    controller: c2,
-                  )
-                ],
+              width: 1000,
+              child: FormScreen(
+                insert: false,
+                product: p,
               ),
             ),
             actions: [
-              TextButton(
+              Button(
+                  child: Text('Fermer'),
                   onPressed: (() {
-                    stateManager.updateProduct(p.id!, c1.text, c2.text);
                     Navigator.pop(context);
-                  }),
-                  child: const Text("Modifier"))
+                    stateManager.getData();
+                  }))
             ],
           );
         }),
@@ -153,6 +150,7 @@ class _ListScreenState extends State<ListScreen> {
 
   delete(BuildContext context, Product p) async {
     var stateManager = getIt<ListManager>();
+  
     showDialog(
         context: context,
         barrierDismissible: true,
@@ -184,9 +182,9 @@ class _ListScreenState extends State<ListScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text("${p.product}  /  ${p.fournisseur}"),
+                  Text("${p.product}  /  ${p.remain}"),
                   TextBox(
-                    header: "Quantité",
+                    header: "Quantité à prendre",
                     controller: c1,
                   ),
                   TextBox(

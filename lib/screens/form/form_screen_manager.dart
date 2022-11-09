@@ -19,6 +19,7 @@ class FormManager {
   int v = 0;
   int? tva;
   int? prix;
+  int? remise;
 
   Future<void> init() async {
     await productNotofier.initialize();
@@ -79,10 +80,12 @@ class FormManager {
       String ht,
       String tva,
       String remise) {
+    int ttct = int.parse(ttc) * int.parse(quantite);
     Product p = Product(
         product: product,
         fournisseur: fournisseur,
-        prixTTC: int.parse(ttc),
+        prixTTCu: int.parse(ttc),
+        prixTTCt: ttct,
         prixHT: int.parse(ht),
         prixTVA: int.parse(tva),
         remise: int.parse(remise),
@@ -90,15 +93,58 @@ class FormManager {
         datePerom: DateFormat.yMd('fr').format(time2),
         nbTest: int.parse(nbTest),
         quantite: int.parse(quantite),
+        remain: int.parse(quantite),
         period: int.parse(period),
+        fusion: 0,
         seuil: int.parse(seuil));
     productNotofier.add(p);
   }
 
+  void updateProduct(
+    int id,
+    String name,
+    String fournisseur,
+    String ht,
+    String tva,
+    String ttc,
+    String remise,
+    String quantite,
+    String nbTest,
+    String seuil,
+    String rest,
+    String period,
+  ) {
+    int ttct = int.parse(ttc) * int.parse(quantite);
+    Product p = Product(
+      product: name,
+      fournisseur: fournisseur,
+      prixTTCu: int.parse(ttc),
+      prixTTCt: ttct,
+      fusion: 0,
+      prixHT: int.parse(ht),
+      prixTVA: int.parse(tva),
+      quantite: int.parse(quantite),
+      remain: int.parse(rest),
+      nbTest: int.parse(nbTest),
+      period: int.parse(period),
+      seuil: int.parse(seuil),
+      remise: int.parse(remise),
+      dateAchat: DateFormat.yMd('fr').format(time1),
+      datePerom: DateFormat.yMd('fr').format(time2),
+    );
+    productNotofier.updateData(id, p);
+  }
+
   void calculeTTC() {
-    int ttc =( prix! + (1 + (tva! / 100))).toInt();
-    ttcNotifier.value = ttc;
-    ttcNotifier.notifyListeners();
-    print(ttc);
+    if (tva != null) {
+      int ttc = (prix! * (1 + (tva! / 100))).toInt();
+      ttcNotifier.value = ttc;
+      ttcNotifier.notifyListeners();
+    }
+    if (remise != 0) {
+      int ttc = (ttcNotifier.value * (1 - (remise! / 100))).toInt();
+      ttcNotifier.value = ttc;
+      ttcNotifier.notifyListeners();
+    }
   }
 }

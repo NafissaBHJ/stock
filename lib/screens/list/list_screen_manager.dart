@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:stock/modals/history_model.dart';
@@ -12,10 +14,6 @@ class ListManager {
 
   Future<void> init() async {
     dataNotifier.initialize();
-  }
-
-  void updateProduct(int id, String quantite, String tests) {
-    dataNotifier.updateData(id, int.parse(quantite), int.parse(tests));
   }
 
   void deleteProduct(int id) {
@@ -33,14 +31,15 @@ class ListManager {
   }
 
   void saveHistory(Product p, String quantite, String name) {
-    int remain = p.quantite - int.parse(quantite);
+    int remain = p.remain - int.parse(quantite);
     History history = History(p.id, name, int.parse(quantite),
         DateFormat.yMd('fr').format(DateTime.now()));
     dataNotifier.updateProductHistory(history, p.id!, remain);
   }
 
   Future<void> getHistory(int id) async {
-    historyNotifier.value = await dataNotifier.getHistory(id) ?? [];
+    var list = await dataNotifier.getHistory(id);
+    historyNotifier.value = list ?? [];
     historyNotifier.notifyListeners();
   }
 }

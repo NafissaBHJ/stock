@@ -6,25 +6,27 @@ class User {
   String username;
   String password;
 
-  User({this.id,required this.username, required this.password});
+  User({this.id, required this.username, required this.password});
   Map<String, Object?> toMap() {
     var map = <String, Object?>{"username": username, "password": password};
     return map;
   }
 
   factory User.fromMap(dynamic map) {
-    return User(id:map['id'],password: map['password'], username: map['username']);
+    return User(
+        id: map['id'], password: map['password'], username: map['username']);
   }
 }
 
 class UserProvider {
-  late var db;
-  late String _path;
+  var db;
+
   late DatabaseFactory databaseFactorys;
 
   Future<void> createDb(String path) async {
     sqfliteFfiInit();
     var databaseFactory = databaseFactoryFfi;
+    print(path);
     db = await databaseFactory.openDatabase(path);
   }
 
@@ -36,12 +38,14 @@ class UserProvider {
   }
 
   Future<User?> getUser(String path, String username, String pass) async {
-    databaseFactory = databaseFactoryFfi;
-    db = await databaseFactory.openDatabase(path);
+    await createDb(path);
+    // print(path);
+    List notes = await db.query('user');
+    print(notes);
     User? u;
     List user = await db.rawQuery(
         'SELECT * FROM user WHERE username=? AND password=?', [username, pass]);
-  
+
     if (user.isNotEmpty) {
       u = List<User>.from(user.map((e) => User.fromMap(e)).toList()).first;
     }

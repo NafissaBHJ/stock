@@ -26,20 +26,27 @@ class HomeManager {
 
   Future<void> getUser(String username, String password) async {
     updateLoginNotifier(false);
+
     User? user = await storageService.getAdmin(username, password);
     if (user != null) {
-      print('user ${user.id}');
+  
       await storageService.setUser(user.id!);
-      u = await storageService.getUserP();
-      print("uuuuuuuuuuuu $u");
-      homeNotifier.value.state = true;
-      homeNotifier.notifyListeners();
+   
+      updateStateNotifier(true);
     } else {
       updateLoginNotifier(true);
     }
   }
 
+  void updateStateNotifier(bool val) {
+    homeNotifier.value.state = val;
+    homeNotifier.notifyListeners();
+      loggedNotifier.value =!val;
+    loggedNotifier.notifyListeners;
+  }
+
   void updateLoginNotifier(bool val) {
+    print(val);
     loggedNotifier.value = val;
     loggedNotifier.notifyListeners;
   }

@@ -25,23 +25,20 @@ class DatabaseServiceStorage extends StorageService {
     var databasesPath = await getApplicationDocumentsDirectory();
     // var path = p.join(Directory.current.path, 'assets/db.sqlite');
     var path = p.join(databasesPath.path, 'db.sqlite');
-    var exists = await databaseFactory.databaseExists(path);
-    print(exists);
-    db = await databaseFactory.openDatabase(path);
-
+    await open(path);
     // db.getVersion().then((value){});
-    if (exists == false) {
-      _pProvider.createDb(path);
-      await createTables();
-    } else {
-      _path = path;
-      await createTables();
-    }
+
+    _path = path;
+    await createTables();
+  }
+
+  Future<void> open(String path) async {
+    //   await databaseFactory.databaseExists(path);
+    db = await databaseFactory.openDatabase(path);
   }
 
   Future<void> createTables() async {
     await db.execute('PRAGMA foreign_keys = ON');
-
     await db.execute('''
       CREATE TABLE if not exists product (
         id INTEGER PRIMARY KEY,
@@ -50,11 +47,14 @@ class DatabaseServiceStorage extends StorageService {
         user TEXT,
         seuil INTEGER,
         quantite INTEGER,
+        rest INTEGER,
         nb_test INTEGER,
         ht INTEGER,
         tva INTEGER,
         remise INTEGER,
-        ttc INTEGER,
+        ttcu INTEGER,
+        ttct INTEGER,
+        fusion INTEGER,
         date_achat TEXT,
         date_peromp TEXT,
         period INTEGER NULL 
@@ -69,20 +69,28 @@ class DatabaseServiceStorage extends StorageService {
         date TEXT
       )
     ''');
+
     await db.execute('''
       CREATE TABLE if not exists user (
         id INTEGER PRIMARY KEY,
         username TEXT,
-        password TEXT
+        password TEXT,
+        job_id INTEGER
       )
     ''');
 
     List notes = await db.query('user');
-    // print(notes);
-    if (notes.isEmpty) {
-      db.rawInsert('INSERT INTO user(username, password) VALUES(?, ?)',
-          ["admin", "123aze"]);
+    print(notes);
+    if (notes.length == 0) {
+      await db.rawInsert(
+          'INSERT INTO user(username, password,job_id) VALUES(?, ?)',
+          ["admin", "123aze", "1"]);
+      await db.rawInsert(
+          'INSERT INTO user(username, password,job_id) VALUES(?, ?)',
+          ["user", "456aze", "2"]);
     }
+
+    await db.close();
   }
 
   @override
@@ -99,8 +107,8 @@ class DatabaseServiceStorage extends StorageService {
   }
 
   @override
-  Future<void> update(id, quantite, tests) async {
-    await _pProvider.updateProduct(_path, id, quantite, tests);
+  Future<void> update(id, p) async {
+    await _pProvider.updateProduct(_path, id, p);
   }
 
   @override
@@ -109,6 +117,7 @@ class DatabaseServiceStorage extends StorageService {
     await historyProvider.deleteProductHistory(id, _path);
   }
 
+  @override
   Future<User?> getAdmin(String u, String p) async {
     User? user = await userProvider.getUser(_path, u, p);
     return user;

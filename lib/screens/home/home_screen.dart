@@ -34,49 +34,55 @@ class _MyHomePageState extends State<MyHomePage> {
         // showing short Toast
 
         return NavigationView(
-          appBar: NavigationAppBar(
-              title: const Text("Gestion du stock"),
-              actions: Container(
-                margin: const EdgeInsets.only(right: 10),
-                width: 100,
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: const [Icon(FluentIcons.settings)],
-                  ),
-                ),
-              ),
+          appBar: const NavigationAppBar(
+              title: Text("Gestion du stock"),
               automaticallyImplyLeading: false),
           contentShape: const BeveledRectangleBorder(),
           pane: stateManager.homeNotifier.value.state == true
               ? NavigationPane(
-                  header: const Text("Menu"),
                   size: const NavigationPaneSize(openWidth: 200),
                   indicator: const StickyNavigationIndicator(
                     color: Colors.transparent,
                   ),
-                  displayMode: PaneDisplayMode.open,
+                  displayMode: PaneDisplayMode.compact,
                   selected: value.index,
                   onChanged: ((val) {
                     stateManager.updateIndex(val);
                   }),
                   items: [
-                    PaneItem(
-                        icon: const Icon(
-                          FluentIcons.clipboard_list,
-                          size: 18,
-                        ),
-                        title: const Text("Stock list"),
-                        body: ListScreen()),
-                    PaneItem(
-                        icon: const Icon(
-                          FluentIcons.add_to_shopping_list,
-                          size: 18,
-                        ),
-                        title: const Text("Form"),
-                        body: FormScreen())
-                  ],
-                )
+                      PaneItem(
+                          icon: const Icon(
+                            FluentIcons.clipboard_list,
+                            size: 18,
+                          ),
+                          title: const Text("Stock list"),
+                          body: ListScreen()),
+                      PaneItem(
+                          icon: const Icon(
+                            FluentIcons.add_to_shopping_list,
+                            size: 18,
+                          ),
+                          title: const Text("Form"),
+                          body: FormScreen(
+                            insert: true,
+                            product: null,
+                          ))
+                    ],
+                  footerItems: [
+                      PaneItemHeader(
+                        header: IconButton(
+                            icon: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: const [
+                                Icon(FluentIcons.leave),
+                                Text("Se déconnecter")
+                              ],
+                            ),
+                            onPressed: () {
+                              stateManager.updateStateNotifier(false);
+                            }),
+                      ),
+                    ])
               : null,
           content: stateManager.homeNotifier.value.state == false
               ? LoginWidget()

@@ -7,7 +7,7 @@ abstract class StorageService {
 
   Future<List<dynamic>?> getRecord() async {}
   Future<void> insert(dynamic input) async {}
-  Future<void> update(id, quantite, tests) async {}
+  Future<void> update(int id, pduct) async {}
   Future<void> delete(id) async {}
   Future<void> setUser(int state) async {}
   Future<int?> getUserP() async {}

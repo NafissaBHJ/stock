@@ -12,6 +12,13 @@ abstract class StorageService {
   Future<void> setUser(int state) async {}
   Future<int?> getUserP() async {}
   Future<User?> getAdmin(String u, String p) async {}
-  Future<void> updateHistory(History h, int id,int pq) async {}
-  Future<List<History>?> getHistory(int id) async{}
+  Future<List<User>> getUsers() async {
+    return [];
+  }
+  Future<void> updateHistory(History h, int id, int pq) async {}
+  Future<List<History>?> getHistory(int id) async {}
+  Future<void> insertUser(User user) async {}
+  Future<void> updatePassword(int id,String str) async {}
+
+  Future<void> deleteUser(int id) async {} 
 }

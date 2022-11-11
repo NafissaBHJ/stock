@@ -1,4 +1,4 @@
-import 'dart:developer';
+
 
 import 'package:data_table_2/data_table_2.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -237,7 +237,7 @@ class ProductDataSource extends m.DataTableSource {
   }
 
   DataRow2 RowMethod(Product row, int index) {
-    print(index);
+   
     return DataRow2(
         color: row.calculeRest() == true
             ? m.MaterialStateProperty.all<Color>(Colors.red.lightest)

@@ -83,10 +83,10 @@ class DatabaseServiceStorage extends StorageService {
     print(notes);
     if (notes.length == 0) {
       await db.rawInsert(
-          'INSERT INTO user(username, password,job_id) VALUES(?, ?)',
+          'INSERT INTO user(username, password,job_id) VALUES(?, ?,?)',
           ["admin", "123aze", "1"]);
       await db.rawInsert(
-          'INSERT INTO user(username, password,job_id) VALUES(?, ?)',
+          'INSERT INTO user(username, password,job_id) VALUES(?, ?,?)',
           ["user", "456aze", "2"]);
     }
 
@@ -134,6 +134,12 @@ class DatabaseServiceStorage extends StorageService {
   }
 
   @override
+  Future<List<User>> getUsers() async {
+    await open(_path);
+    return userProvider.getUsers(_path);
+  }
+
+  @override
   Future<void> updateHistory(History h, int id, int productQ) async {
     await historyProvider.insertHistory(h, _path);
     await historyProvider.updateProduct(_path, id, productQ);
@@ -142,7 +148,21 @@ class DatabaseServiceStorage extends StorageService {
   @override
   Future<List<History>?> getHistory(int id) async {
     List<History>? hList = await historyProvider.getHistory(id, _path);
-
     return hList;
+  }
+
+  @override
+  Future<void> insertUser( User user) async {
+    await userProvider.insert(user, _path);
+  }
+
+  @override
+  Future<void> updatePassword(int id, String str) async {
+    await userProvider.updateUserPw(id, str, _path);
+  }
+
+  @override
+  Future<void> deleteUser(int id) async {
+    await userProvider.deleteUser(id, _path);
   }
 }

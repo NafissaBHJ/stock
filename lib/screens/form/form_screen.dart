@@ -3,6 +3,8 @@ import 'package:stock/modals/data_model.dart';
 import 'package:stock/screens/form/form_screen_manager.dart';
 import 'package:stock/services/service_locator.dart';
 
+import '../../utils/widgets/input_widget.dart';
+
 class FormScreen extends StatefulWidget {
   FormScreen({Key? key, required this.insert, required this.product})
       : super(key: key);
@@ -112,6 +114,7 @@ class _FormScreenState extends State<FormScreen> {
                       builder: (BuildContext context, value, Widget? child) {
                         print(controllerTTC.text);
                         print("val$value");
+                        controllerTTC.text = value.toString();
                         return InputNumberWidget(
                           field: "Prix TTC",
                           input: "Entrer",
@@ -237,47 +240,6 @@ class _FormScreenState extends State<FormScreen> {
   }
 }
 
-class InputWidget extends StatelessWidget {
-  InputWidget({
-    required String field,
-    required String input,
-    required TextEditingController controller,
-    Key? key,
-  })  : _field = field,
-        _input = input,
-        _controller = controller,
-        super(key: key);
-
-  final String _field;
-  final String _input;
-  final TextEditingController _controller;
-
-  final stateManager = getIt<FormManager>();
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<int?>(
-      valueListenable: stateManager.userNotifer,
-      builder: (BuildContext context, dynamic value, Widget? child) {
-        return Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: TextFormBox(
-              controller: _controller,
-              header: _field,
-              placeholder: _input,
-              validator: (value) => stateManager.validate(value),
-              decoration: const BoxDecoration(),
-              onEditingComplete: () => FocusScope.of(context).nextFocus(),
-              enabled: value == 1 ? true : false,
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
 class InputNumberWidget extends StatelessWidget {
   InputNumberWidget({
     required String field,
@@ -299,42 +261,35 @@ class InputNumberWidget extends StatelessWidget {
   final stateManager = getIt<FormManager>();
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<int?>(
-      builder: (BuildContext context, value, Widget? child) {
-        return Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: TextFormBox(
-              controller: _controller,
-              header: _field,
-              placeholder: _input,
-              validator: (value) => stateManager.validateN(value),
-              decoration: const BoxDecoration(),
-              onEditingComplete: () {
-                FocusScope.of(context).nextFocus();
-                if (_field.compareTo("TVA") == 0) {
-                  stateManager.tva = int.tryParse(_controller.text);
-                }
-                if (_field.compareTo("Prix HT") == 0) {
-                  stateManager.prix = int.tryParse(_controller.text);
-                }
-                if (_field.compareTo("Remise") == 0) {
-                  if (_controller.text.isNotEmpty) {
-                    stateManager.remise = int.tryParse(_controller.text);
-                  }
-                }
-                if (setTTC) {
-                  stateManager.calculeTTC();
-                }
-              },
-              enabled: value == 1 && (_field.compareTo("Prix TTC") != 0)
-                  ? true
-                  : false,
-            ),
-          ),
-        );
-      },
-      valueListenable: stateManager.userNotifer,
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: TextFormBox(
+          controller: _controller,
+          header: _field,
+          placeholder: _input,
+          validator: (value) => stateManager.validateN(value),
+          decoration: const BoxDecoration(),
+          onEditingComplete: () {
+            FocusScope.of(context).nextFocus();
+            if (_field.compareTo("TVA") == 0) {
+              stateManager.tva = int.tryParse(_controller.text);
+            }
+            if (_field.compareTo("Prix HT") == 0) {
+              stateManager.prix = int.tryParse(_controller.text);
+            }
+            if (_field.compareTo("Remise") == 0) {
+              if (_controller.text.isNotEmpty) {
+                stateManager.remise = int.tryParse(_controller.text);
+              }
+            }
+            if (setTTC) {
+              stateManager.calculeTTC();
+            }
+          },
+          enabled: _field.compareTo("Prix TTC") != 0 ? true : false,
+        ),
+      ),
     );
   }
 }

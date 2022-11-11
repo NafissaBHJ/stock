@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' as mat;
 import 'package:stock/screens/form/form_screen.dart';
 import 'package:stock/screens/home/home_screen_manager.dart';
 import 'package:stock/screens/list/list_screen.dart';
+import 'package:stock/screens/list/list_user_screen.dart';
 import 'package:stock/services/service_locator.dart';
 import '../../modals/home_model.dart';
 
@@ -31,7 +32,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Home>(
       builder: (BuildContext context, value, Widget? child) {
-        // showing short Toast
+      
+        if (stateManager.homeNotifier.value.userId != 1) {
+          stateManager.updateIndex(0);
+        }
 
         return NavigationView(
           appBar: const NavigationAppBar(
@@ -47,27 +51,45 @@ class _MyHomePageState extends State<MyHomePage> {
                   displayMode: PaneDisplayMode.compact,
                   selected: value.index,
                   onChanged: ((val) {
+                
                     stateManager.updateIndex(val);
                   }),
-                  items: [
-                      PaneItem(
-                          icon: const Icon(
-                            FluentIcons.clipboard_list,
-                            size: 18,
-                          ),
-                          title: const Text("Stock list"),
-                          body: ListScreen()),
-                      PaneItem(
-                          icon: const Icon(
-                            FluentIcons.add_to_shopping_list,
-                            size: 18,
-                          ),
-                          title: const Text("Form"),
-                          body: FormScreen(
-                            insert: true,
-                            product: null,
-                          ))
-                    ],
+                  items: stateManager.homeNotifier.value.userId == 1
+                      ? [
+                          PaneItem(
+                              icon: const Icon(
+                                FluentIcons.clipboard_list,
+                                size: 18,
+                              ),
+                              title: const Text("Stock list"),
+                              body: ListScreen()),
+                          PaneItem(
+                              icon: const Icon(
+                                FluentIcons.add_to_shopping_list,
+                                size: 18,
+                              ),
+                              title: const Text("Form"),
+                              body: FormScreen(
+                                insert: true,
+                                product: null,
+                              )),
+                          PaneItem(
+                              icon: const Icon(
+                                FluentIcons.add_to_shopping_list,
+                                size: 18,
+                              ),
+                              title: const Text("User list"),
+                              body: UserListScreen())
+                        ]
+                      : [
+                          PaneItem(
+                              icon: const Icon(
+                                FluentIcons.clipboard_list,
+                                size: 18,
+                              ),
+                              title: const Text("Stock list"),
+                              body: ListScreen()),
+                        ],
                   footerItems: [
                       PaneItemHeader(
                         header: IconButton(

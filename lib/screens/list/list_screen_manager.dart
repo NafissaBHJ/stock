@@ -1,19 +1,23 @@
-import 'dart:io';
-
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:intl/intl.dart';
 import 'package:stock/modals/history_model.dart';
+import 'package:stock/modals/user_model.dart';
 import 'package:stock/screens/notifiers/product_notifier.dart';
+import 'package:stock/screens/notifiers/user_notifier.dart';
 import '../../modals/data_model.dart';
-import '../../services/database_service/storage_service.dart';
-import '../../services/service_locator.dart';
 
 class ListManager {
   final dataNotifier = ProductNotifier();
   final historyNotifier = ValueNotifier<List<History>>([]);
+  final fonctionalityNotfier = ValueNotifier<int>(0);
+  final userNotifier = UserNotifier();
 
   Future<void> init() async {
     dataNotifier.initialize();
+  }
+
+  Future<void> getUsers() async {
+    await userNotifier.getUsers();
   }
 
   void deleteProduct(int id) {
@@ -41,5 +45,25 @@ class ListManager {
     var list = await dataNotifier.getHistory(id);
     historyNotifier.value = list ?? [];
     historyNotifier.notifyListeners();
+  }
+
+  Future<void> insertNewUser(
+      String username, String password, int jobId) async {
+    User u = User(username: username, password: password, jobId: jobId);
+    await userNotifier.insert(u);
+  }
+
+  Future<void> updateUserPw(int id, String password) async {
+    print(password);
+    await userNotifier.modifyUserPw(id, password);
+  }
+
+  Future<void> deleteUser(int id) async {
+    await userNotifier.deleteUser(id);
+  }
+
+  void updateFunction(dynamic v) {
+    fonctionalityNotfier.value = v;
+    fonctionalityNotfier.notifyListeners();
   }
 }

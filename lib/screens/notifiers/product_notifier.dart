@@ -27,7 +27,6 @@ class ProductNotifier extends ValueNotifier<List<Product>> {
   Future<void> getData() async {
     final List<Product> products =
         (await _storageService.getRecord())?.cast<Product>() ?? [];
-    print("------------------------------- $products");
     _update(products);
   }
 

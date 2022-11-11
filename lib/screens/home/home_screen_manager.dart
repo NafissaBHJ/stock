@@ -29,9 +29,8 @@ class HomeManager {
 
     User? user = await storageService.getAdmin(username, password);
     if (user != null) {
-  
-      await storageService.setUser(user.id!);
-   
+      await storageService.setUser(user.jobId!);
+      updateUserIdNotifier(user.jobId!);
       updateStateNotifier(true);
     } else {
       updateLoginNotifier(true);
@@ -41,8 +40,13 @@ class HomeManager {
   void updateStateNotifier(bool val) {
     homeNotifier.value.state = val;
     homeNotifier.notifyListeners();
-      loggedNotifier.value =!val;
+    loggedNotifier.value = !val;
     loggedNotifier.notifyListeners;
+  }
+
+  void updateUserIdNotifier(int id) {
+    homeNotifier.value.userId = id;
+    homeNotifier.notifyListeners();
   }
 
   void updateLoginNotifier(bool val) {

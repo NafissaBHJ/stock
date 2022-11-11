@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' as material;
 import 'package:stock/screens/form/form_screen.dart';
 import 'package:stock/screens/list/list_screen_manager.dart';
 import 'package:stock/services/service_locator.dart';
+import 'package:stock/utils/widgets/input_widget.dart';
 
 import '../../modals/data_model.dart';
 import '../../modals/history_model.dart';
@@ -35,7 +36,6 @@ class _ListScreenState extends State<ListScreen> {
               update: (index) => modify(context, value[index]),
               delete: ((index) => delete(context, value[index])),
               history: ((index) {
-                print("iiiddd ${value[index].id!}");
                 stateManager.getHistory(value[index].id!);
                 history(context, value[index]);
               }),
@@ -139,8 +139,9 @@ class _ListScreenState extends State<ListScreen> {
               Button(
                   child: Text('Fermer'),
                   onPressed: (() {
-                    Navigator.pop(context);
+                    
                     stateManager.getData();
+                    Navigator.pop(context);
                   }))
             ],
           );
@@ -150,7 +151,7 @@ class _ListScreenState extends State<ListScreen> {
 
   delete(BuildContext context, Product p) async {
     var stateManager = getIt<ListManager>();
-  
+
     showDialog(
         context: context,
         barrierDismissible: true,
@@ -160,7 +161,7 @@ class _ListScreenState extends State<ListScreen> {
             content: Text('Vous voulez supprimer ${p.product} ?'),
             actions: [
               TextButton(
-                  onPressed: (() => stateManager.deleteProduct(p.id!)),
+                  onPressed: (() { stateManager.deleteProduct(p.id!);Navigator.pop(context);}),
                   child: Text('Supprimer'))
             ],
           );
@@ -183,14 +184,18 @@ class _ListScreenState extends State<ListScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text("${p.product}  /  ${p.remain}"),
-                  TextBox(
-                    header: "Quantité à prendre",
-                    controller: c1,
-                  ),
-                  TextBox(
-                    header: "Votre nom",
-                    controller: c2,
-                  ),
+                  InputNumberWidget(
+                      field: "Quantité",
+                      input: "Enter la quantité à prendre",
+                      controller: c1),
+                  InputWidget(
+                      field: "Username",
+                      input: "Entrer votre nom d'utilisateur",
+                      controller: c2),
+                  InputWidget(
+                      field: "Password",
+                      input: "Entrer votre mot de passe",
+                      controller: c2)
                 ],
               ),
             ),

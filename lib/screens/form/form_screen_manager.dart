@@ -10,7 +10,7 @@ class FormManager {
   final couunterNotifier = ValueNotifier<int>(0);
   final timePickerNotifier = ValueNotifier<DateTime>(DateTime.now());
   final productNotofier = ProductNotifier();
-  final userNotifer = ValueNotifier<int?>(0);
+
   final storage = getIt<StorageService>();
   final ttcNotifier = ValueNotifier<int>(0);
 
@@ -23,9 +23,6 @@ class FormManager {
 
   Future<void> init() async {
     await productNotofier.initialize();
-    userNotifer.value = await storage.getUserP();
-    userNotifer.notifyListeners();
-    print(userNotifer.value);
   }
 
   String incrementCounter(String val) {

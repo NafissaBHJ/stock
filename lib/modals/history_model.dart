@@ -2,6 +2,11 @@ import 'package:sqflite/sqflite.dart';
 
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+/*
+ * 
+ *  Model for saving users consumption logs 
+ * 
+ */
 class History {
   int? id;
   String? name;
@@ -34,7 +39,6 @@ class HistoryProvider {
     db = await databaseFactory.openDatabase(path);
     var value = h.toMap();
     db.insert("history", value);
-    var his = await db.query('history');
     await db.close();
   }
 
@@ -56,13 +60,11 @@ class HistoryProvider {
     var productH =
         await db.rawQuery('SELECT  * FROM history WHERE product_id =?', [id]);
     await db.close();
-
     return List<History>.from(productH.map((e) => History.fromMap(e)).toList());
   }
 
   Future<int> deleteProductHistory(int id, String path) async {
     databaseFactory = databaseFactoryFfi;
-
     db = await databaseFactory.openDatabase(path);
     return await db.delete("history", where: 'product_id = ?', whereArgs: [id]);
   }

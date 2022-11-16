@@ -41,7 +41,6 @@ class FormManager {
   }
 
   String? validate(String? value) {
-    print(value);
     if (value!.isEmpty) {
       return "error";
     } else {
@@ -50,7 +49,6 @@ class FormManager {
   }
 
   String? validateN(String? value) {
-    print(value);
     if (value!.isEmpty) {
       return "error";
     } else {
@@ -62,8 +60,8 @@ class FormManager {
   }
 
   void updateDate(DateTime time) {
-    print(time);
     timePickerNotifier.value = time;
+    
   }
 
   void InsertProduct(

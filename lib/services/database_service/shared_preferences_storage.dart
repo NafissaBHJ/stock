@@ -13,7 +13,6 @@ class SharedPreferenceStorage extends StorageService {
     late int id;
     final prefs = await SharedPreferences.getInstance();
     id = prefs.getInt("user_id")!;
-    print("eeeeeeeeeeeeeeeeeeee$id");
     return id;
   }
 }

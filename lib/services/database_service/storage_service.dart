@@ -1,5 +1,4 @@
 import '../../modals/history_model.dart';
-import '../../modals/note_model.dart';
 import '../../modals/user_model.dart';
 
 abstract class StorageService {

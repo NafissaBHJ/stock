@@ -28,4 +28,13 @@ class UserNotifier extends ValueNotifier<List<User>> {
     await storageService.updatePassword(id, str);
     await getUsers();
   }
+
+  Future<bool> verifyUser(String u, String p) async {
+    User? user = await storageService.getAdmin(u, p);
+    if (user != null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

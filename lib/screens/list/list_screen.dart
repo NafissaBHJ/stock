@@ -48,13 +48,35 @@ class _ListScreenState extends State<ListScreen> {
                   ? PaginatedDataTable2(
                       header: SearchWidget(),
                       actions: [
-                        IconButton(
-                          icon: const Icon(FluentIcons.refresh),
-                          onPressed: () => stateManager.getData(),
-                        )
+                        SizedBox(
+                          width: 100,
+                          child: Button(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: const [
+                                Icon(FluentIcons.refresh),
+                                Text("Refresh")
+                              ],
+                            ),
+                            onPressed: () => stateManager.getData(),
+                          ),
+                        ),
+                        SizedBox(
+                            width: 100,
+                            child: Button(
+                              onPressed: () => stateManager.generateExcel(),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: const [
+                                  Icon(FluentIcons.download_document),
+                                  Text("Excel ")
+                                ],
+                              ),
+                            ))
                       ],
-                      columnSpacing: 12,
-                      horizontalMargin: 12,
+                      columnSpacing: 10,
+                      horizontalMargin: 10,
                       minWidth: 600,
                       columns: const [
                         DataColumn2(
@@ -139,7 +161,6 @@ class _ListScreenState extends State<ListScreen> {
               Button(
                   child: Text('Fermer'),
                   onPressed: (() {
-                    
                     stateManager.getData();
                     Navigator.pop(context);
                   }))
@@ -161,7 +182,10 @@ class _ListScreenState extends State<ListScreen> {
             content: Text('Vous voulez supprimer ${p.product} ?'),
             actions: [
               TextButton(
-                  onPressed: (() { stateManager.deleteProduct(p.id!);Navigator.pop(context);}),
+                  onPressed: (() {
+                    stateManager.deleteProduct(p.id!);
+                    Navigator.pop(context);
+                  }),
                   child: Text('Supprimer'))
             ],
           );
@@ -172,44 +196,51 @@ class _ListScreenState extends State<ListScreen> {
     var stateManager = getIt<ListManager>();
     var c1 = TextEditingController();
     var c2 = TextEditingController();
+    var c3 = TextEditingController();
     return await showDialog<String>(
-        context: context,
-        builder: ((context) {
-          return ContentDialog(
-            title: const Text("Consommation"),
-            content: SizedBox(
-              height: 200,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text("${p.product}  /  ${p.remain}"),
-                  InputNumberWidget(
-                      field: "Quantité",
-                      input: "Enter la quantité à prendre",
-                      controller: c1),
-                  InputWidget(
-                      field: "Username",
-                      input: "Entrer votre nom d'utilisateur",
-                      controller: c2),
-                  InputWidget(
-                      field: "Password",
-                      input: "Entrer votre mot de passe",
-                      controller: c2)
-                ],
+      context: context,
+      barrierDismissible: true,
+      builder: ((context) {
+        return ValueListenableBuilder<bool>(
+          builder: (context, value, child) {
+            return ContentDialog(
+              title: const Text("Consommation"),
+              content: SizedBox(
+                height: 350,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text("${p.product}  /  ${p.remain}"),
+                    InputNumberWidget(
+                        field: "Quantité",
+                        input: "Enter la quantité à prendre",
+                        controller: c3),
+                    InputWidget(
+                        field: "Username",
+                        input: "Entrer votre nom d'utilisateur",
+                        controller: c1),
+                    InputWidget(
+                        field: "Password",
+                        input: "Entrer votre mot de passe",
+                        controller: c2),
+                  ],
+                ),
               ),
-            ),
-            actions: [
-              TextButton(
-                  onPressed: (() {
-                    stateManager.saveHistory(p, c1.text, c2.text);
-                    Navigator.pop(context);
-                  }),
-                  child: const Text("Enregister"))
-            ],
-          );
-        }),
-        barrierDismissible: true);
+              actions: [
+                TextButton(
+                    onPressed: (() {
+                      stateManager.saveHistory(p, c3.text, c1.text, c2.text);
+                       Navigator.pop(context);
+                    }),
+                    child: const Text("Enregister"))
+              ],
+            );
+          },
+          valueListenable: stateManager.isUserNotifier,
+        );
+      }),
+    );
   }
 
   history(BuildContext context, Product p) async {

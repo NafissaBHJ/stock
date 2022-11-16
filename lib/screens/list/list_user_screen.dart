@@ -134,6 +134,7 @@ class _UserListScreenState extends State<UserListScreen> {
 
     return showDialog(
         context: (context),
+        barrierDismissible: true,
         builder: ((context) {
           return ContentDialog(
               title: const Text("Suppression"),
@@ -141,7 +142,7 @@ class _UserListScreenState extends State<UserListScreen> {
               actions: [
                 TextButton(
                     onPressed: (() => stateManager.deleteUser(value.id!)),
-                    child: Text('Supprimer'))
+                    child: const Text('Supprimer'))
               ]);
         }));
   }
@@ -177,7 +178,7 @@ class _UserListScreenState extends State<UserListScreen> {
                       Navigator.pop(context);
                     }
                   }),
-                  child: Text('Enregistrer'))
+                  child: const Text('Enregistrer'))
             ],
           );
         }));

@@ -32,7 +32,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Home>(
       builder: (BuildContext context, value, Widget? child) {
-      
         if (stateManager.homeNotifier.value.userId != 1) {
           stateManager.updateIndex(0);
         }
@@ -51,9 +50,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   displayMode: PaneDisplayMode.compact,
                   selected: value.index,
                   onChanged: ((val) {
-                
                     stateManager.updateIndex(val);
                   }),
+              
                   items: stateManager.homeNotifier.value.userId == 1
                       ? [
                           PaneItem(
@@ -61,24 +60,24 @@ class _MyHomePageState extends State<MyHomePage> {
                                 FluentIcons.clipboard_list,
                                 size: 18,
                               ),
-                              title: const Text("Stock list"),
+                              title: const Text("Stock liste"),
                               body: ListScreen()),
                           PaneItem(
                               icon: const Icon(
                                 FluentIcons.add_to_shopping_list,
                                 size: 18,
                               ),
-                              title: const Text("Form"),
+                              title: const Text("Formulaire"),
                               body: FormScreen(
                                 insert: true,
                                 product: null,
                               )),
                           PaneItem(
                               icon: const Icon(
-                                FluentIcons.add_to_shopping_list,
+                                FluentIcons.account_management,
                                 size: 18,
                               ),
-                              title: const Text("User list"),
+                              title: const Text("Liste d'utilisateur"),
                               body: UserListScreen())
                         ]
                       : [
@@ -95,9 +94,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         header: IconButton(
                             icon: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              mainAxisSize: MainAxisSize.min,
                               children: const [
                                 Icon(FluentIcons.leave),
-                                Text("Se déconnecter")
+                                Flexible(child: Text("Se déconnecter"))
                               ],
                             ),
                             onPressed: () {

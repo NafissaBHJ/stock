@@ -26,18 +26,18 @@ class DatabaseServiceStorage extends StorageService {
     // var path = p.join(Directory.current.path, 'assets/db.sqlite');
     var path = p.join(databasesPath.path, 'db.sqlite');
     await open(path);
-    // db.getVersion().then((value){});
-
     _path = path;
     await createTables();
   }
 
   Future<void> open(String path) async {
-    //   await databaseFactory.databaseExists(path);
     db = await databaseFactory.openDatabase(path);
   }
-
+  /*
+   * Creates tables the first time only 
+   */
   Future<void> createTables() async {
+
     await db.execute('PRAGMA foreign_keys = ON');
     await db.execute('''
       CREATE TABLE if not exists product (
@@ -79,9 +79,9 @@ class DatabaseServiceStorage extends StorageService {
       )
     ''');
 
-    List notes = await db.query('user');
-    print(notes);
-    if (notes.length == 0) {
+    List users= await db.query('user');
+
+    if (users.isEmpty) {
       await db.rawInsert(
           'INSERT INTO user(username, password,job_id) VALUES(?, ?,?)',
           ["admin", "123aze", "1"]);
@@ -102,7 +102,6 @@ class DatabaseServiceStorage extends StorageService {
 
   @override
   Future<void> insert(input) async {
-    print('here product $input');
     await _pProvider.insertProduct(input, _path);
   }
 

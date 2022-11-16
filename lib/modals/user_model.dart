@@ -53,12 +53,13 @@ class UserProvider {
     db = await databaseFactory.openDatabase(path);
     var value = u.toMap();
     db.insert("user", value);
+    await db.close();
   }
 
   Future<List<User>> getUsers(String path) async {
     await openDb(path);
-
     var users = await db.query('user');
+    await db.close();
     return List<User>.from(users.map((e) => User.fromMap(e)).toList());
   }
 
@@ -77,15 +78,13 @@ class UserProvider {
 
   Future<void> updateUserPw(int id, String pw, String path) async {
     await openDb(path);
-    print("k $pw $id");
     int row = await db.rawUpdate('''
     UPDATE user 
     SET password = ?
     WHERE id = ?
     ''', [pw, id]);
-    print("kkkkkkkkkk $row");
-    var users = await db.query('user');
-    print(users);
+    
+    await db.close();
   }
 
   Future<void> deleteUser(int id, String path) async {
@@ -105,7 +104,6 @@ class UserDataSourceTable extends m.DataTableSource {
   @override
   m.DataRow? getRow(int index) {
     final row = list[index];
-    print(row);
     return rowMethod(row, index);
   }
 

@@ -4,11 +4,17 @@ A windows app  for stock management.
 
 - Add Products to local database
 
-- Manage Products
+- Manage Products ( CRUD operations )
+
+- Manage users ( with role Admin/User ) 
+
+- Generate Excel file of the products
 
 - Get notification when threshold is reached
 
 - Get notifications when Expired date is near
+
+![alt text](https://github.com/NafissaBHJ/stock/blob/master//image0.png?raw=true)
 
 ## What it is about ?
 
@@ -20,8 +26,11 @@ Before you go through the codebase I want to mention a few points that you may c
 
 - The state management is accomplished with getIt used in the above blog post as well .
 
+- The app is currently in french ( per client request ) but will be Internationalized
 
 
+
+![alt text](https://github.com/NafissaBHJ/stock/blob/master//image1.png?raw=true)
 
 <a title="Made with Fluent Design" href="https://github.com/bdlukaa/fluent_ui">
   <img

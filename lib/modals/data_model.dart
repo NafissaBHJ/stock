@@ -121,11 +121,11 @@ class Product {
     if (rest == true) {
       notification(product);
     }
-    VerificationDate();
+    verificationDate();
     return rest!;
   }
 
-  void VerificationDate() {
+  void verificationDate() {
     perom = false;
     var dateTime1 = DateTime.now();
     var dateTime2 =
@@ -142,7 +142,11 @@ class Product {
       notificationDate(product);
     }
   }
-
+  /*
+   *
+   *  Notifications for windows 
+   * 
+  */
   Future<void> notification(String name) async {
     final toast = await WinToast.instance().showToast(
         type: ToastType.text01,
@@ -158,6 +162,11 @@ class Product {
   }
 }
 
+/*
+*
+* The below class is for the product ( main data ) database operations
+*
+*/
 class ProductProvider {
   late var db;
   late String _path;
@@ -174,18 +183,15 @@ class ProductProvider {
     db = await databaseFactory.openDatabase(path);
     var value = p.toMap();
     db.insert("product", value);
+    await db.close();
   }
 
   Future<List<Product>> getAllProducts(String path) async {
     databaseFactory = databaseFactoryFfi;
-    print(path);
     db = await databaseFactory.openDatabase(path);
-
     var products =
         await db.rawQuery('SELECT * from product ORDER BY produit ASC');
-
     await db.close();
-
     return List<Product>.from(products.map((e) => Product.fromMap(e)).toList());
   }
 
@@ -193,11 +199,7 @@ class ProductProvider {
     databaseFactory = databaseFactoryFfi;
     db = await databaseFactory.openDatabase(path);
     var value = p.toMap();
-    print(value);
-    print(id);
-    int row =
-        await db.update("product", value, where: 'id = ?', whereArgs: [id]);
-    print(row);
+    await db.update("product", value, where: 'id = ?', whereArgs: [id]);
     await db.close();
   }
 
@@ -206,9 +208,14 @@ class ProductProvider {
 
     db = await databaseFactory.openDatabase(path);
     return await db.delete("product", where: 'id = ?', whereArgs: [id]);
+     
   }
 }
-
+/*
+ * 
+ *  Below class to return the product's rows for the Datatable widget 
+ * 
+ */
 typedef OnRowSelect = void Function(int index);
 
 class ProductDataSource extends m.DataTableSource {
@@ -292,14 +299,11 @@ class ProductDataSource extends m.DataTableSource {
   }
 
   @override
-  // TODO: implement isRowCountApproximate
   bool get isRowCountApproximate => false;
 
   @override
-  // TODO: implement rowCount
   int get rowCount => list.length;
 
   @override
-  // TODO: implement selectedRowCount
   int get selectedRowCount => 0;
 }

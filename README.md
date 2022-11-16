@@ -33,7 +33,7 @@ Before you go through the codebase I want to mention a few points that you may c
 ![alt text](https://github.com/NafissaBHJ/stock/blob/master/images/image1.png?raw=true)
 ![alt text](https://github.com/NafissaBHJ/stock/blob/master/images/image2.png?raw=true)
 ![alt text](https://github.com/NafissaBHJ/stock/blob/master/images/image3.png?raw=true)
-![alt text](https://github.com/NafissaBHJ/stock/blob/master/images/image4.png?raw=true)
+![alt text](https://github.com/NafissaBHJ/stock/blob/master/images/image4.jpeg?raw=true)
 
 
 <a title="Made with Fluent Design" href="https://github.com/bdlukaa/fluent_ui">

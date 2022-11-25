@@ -61,7 +61,6 @@ class FormManager {
 
   void updateDate(DateTime time) {
     timePickerNotifier.value = time;
-    
   }
 
   void InsertProduct(
@@ -74,8 +73,14 @@ class FormManager {
       String ttc,
       String ht,
       String tva,
-      String remise) {
-    int ttct = int.parse(ttc) * int.parse(quantite);
+      String remise,
+      String free) {
+    int ttct = 0;
+    if (int.parse(free) != 0) {
+      ttct = int.parse(ttc) * (int.parse(quantite) - int.parse(free));
+    } else {
+      ttct = int.parse(ttc) * int.parse(quantite);
+    }
     Product p = Product(
         product: product,
         fournisseur: fournisseur,
@@ -91,25 +96,44 @@ class FormManager {
         remain: int.parse(quantite),
         period: int.parse(period),
         fusion: 0,
+        free: int.parse(free),
         seuil: int.parse(seuil));
     productNotofier.add(p);
   }
 
   void updateProduct(
-    int id,
-    String name,
-    String fournisseur,
-    String ht,
-    String tva,
-    String ttc,
-    String remise,
-    String quantite,
-    String nbTest,
-    String seuil,
-    String rest,
-    String period,
-  ) {
-    int ttct = int.parse(ttc) * int.parse(quantite);
+      Product prod,
+      String name,
+      String fournisseur,
+      String ht,
+      String tva,
+      String ttc,
+      String remise,
+      String quantite,
+      String nbTest,
+      String seuil,
+      String rest,
+      String period,
+      String free) {
+    // if you modify quantite 
+    int ttct = 0;
+    int added = 0;
+    int rest2 = 0;
+  
+    if (int.parse(quantite) == prod.quantite) {
+      rest2 = int.parse(rest);
+      added = prod.quantite;
+      ttct = (int.parse(ttc) * (int.parse(quantite) - int.parse(free)));
+    } else {
+      rest2 = prod.remain + (int.parse(quantite) - prod.quantite);
+      added = int.parse(quantite);
+      if (int.parse(free) != prod.free) {
+        ttct = (int.parse(ttc) * (int.parse(quantite) - int.parse(free)));
+      } else {
+        ttct = (int.parse(ttc) * (int.parse(quantite) - prod.free!));
+      }
+    }
+
     Product p = Product(
       product: name,
       fournisseur: fournisseur,
@@ -118,16 +142,17 @@ class FormManager {
       fusion: 0,
       prixHT: int.parse(ht),
       prixTVA: int.parse(tva),
-      quantite: int.parse(quantite),
-      remain: int.parse(rest),
+      quantite: added,
+      remain: rest2,
       nbTest: int.parse(nbTest),
       period: int.parse(period),
       seuil: int.parse(seuil),
       remise: int.parse(remise),
+      free:  int.parse(free),
       dateAchat: DateFormat.yMd('fr').format(time1),
       datePerom: DateFormat.yMd('fr').format(time2),
     );
-    productNotofier.updateData(id, p);
+    productNotofier.updateData(prod.id!, p);
   }
 
   void calculeTTC() {

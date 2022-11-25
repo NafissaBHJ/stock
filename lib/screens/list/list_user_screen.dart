@@ -28,7 +28,8 @@ class _UserListScreenState extends State<UserListScreen> {
         material.DataTableSource source = UserDataSourceTable(
             delete: ((index) => delete(context, value[index])),
             list: value,
-            updatePw: (index) => modifyPw(context, value[index]));
+            updatePw: (index) => modifyPw(context, value[index]),
+            deleteH: ((index) => deleteH(value[index])));
 
         return SizedBox(
           width: MediaQuery.of(context).size.width,
@@ -181,6 +182,24 @@ class _UserListScreenState extends State<UserListScreen> {
                   child: const Text('Enregistrer'))
             ],
           );
+        }));
+  }
+
+  deleteH(User u) {
+      var stateManager = getIt<ListManager>();
+
+    return showDialog(
+        context: (context),
+        barrierDismissible: true,
+        builder: ((context) {
+          return ContentDialog(
+              title: const Text("Suppression"),
+              content: Text("Vous voulez vraiment supprimer l'historique de ${u.username}"),
+              actions: [
+                TextButton(
+                    onPressed: (() => stateManager.deleteUserHistory(u.username!)),
+                    child: const Text('Supprimer'))
+              ]);
         }));
   }
 }

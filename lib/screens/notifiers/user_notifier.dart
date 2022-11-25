@@ -24,6 +24,10 @@ class UserNotifier extends ValueNotifier<List<User>> {
     await getUsers();
   }
 
+  Future<void> deleteUserH(String name) async {
+    await storageService.deleteUserHistory(name);
+  }
+
   Future<void> modifyUserPw(int id, String str) async {
     await storageService.updatePassword(id, str);
     await getUsers();

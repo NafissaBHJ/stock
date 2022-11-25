@@ -39,6 +39,8 @@ class _FormScreenState extends State<FormScreen> {
       TextEditingController(text: p == null ? null : p!.remise.toString());
   late var controllerReste =
       TextEditingController(text: p == null ? null : p!.remain.toString());
+  late var controllerFree =
+      TextEditingController(text: p == null ? null : p!.getfree());
   final _key = GlobalKey<FormState>();
 
   final stateManager = getIt<FormManager>();
@@ -132,7 +134,9 @@ class _FormScreenState extends State<FormScreen> {
                     InputNumberWidget(
                       controller: controllerC1,
                       field: "Quantité",
-                      input: 'Entrer la quantitée globale',
+                      input: 
+                           'Entrer la quantitée globale'
+                         
                     ),
                     InputNumberWidget(
                       controller: controllerC2,
@@ -151,22 +155,25 @@ class _FormScreenState extends State<FormScreen> {
                     ),
                     InputNumberWidget(
                       field: "Periode",
-                      input: "Modifier la periode ",
+                      input: "Entrer la periode en jours ",
                       controller: controllerE,
                     ),
                   ],
                 ),
-                p != null
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                            InputNumberWidget(
-                              field: "Quantité restante",
-                              input: "Modifier ",
-                              controller: controllerReste,
-                            ),
-                          ])
-                    : SizedBox.shrink(),
+                Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                  p != null
+                      ? InputNumberWidget(
+                          field: "Quantité restante",
+                          input: "Modifier ",
+                          controller: controllerReste,
+                        )
+                      : SizedBox.shrink(),
+                  InputNumberWidget(
+                    field: "Quantité gratuite",
+                    input: "Ajouter la quantité gratuite ",
+                    controller: controllerFree,
+                  )
+                ]),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -203,7 +210,8 @@ class _FormScreenState extends State<FormScreen> {
                                 controllerTTC.text,
                                 controllerHT.text,
                                 controllerTVA.text,
-                                controllerRemise.text);
+                                controllerRemise.text,
+                                controllerFree.text);
                             controllerC1.clear();
                             controllerC2.clear();
                             controllerF.clear();
@@ -216,7 +224,7 @@ class _FormScreenState extends State<FormScreen> {
                             controllerRemise.clear();
                           } else {
                             stateManager.updateProduct(
-                              p!.id!,
+                              p!,
                               controllerP.text,
                               controllerF.text,
                               controllerHT.text,
@@ -228,6 +236,7 @@ class _FormScreenState extends State<FormScreen> {
                               controllerS.text,
                               controllerReste.text,
                               controllerE.text,
+                              controllerFree.text,
                             );
                           }
                         }

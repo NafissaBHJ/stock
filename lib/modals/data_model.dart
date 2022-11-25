@@ -1,5 +1,3 @@
-
-
 import 'package:data_table_2/data_table_2.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as m;
@@ -27,6 +25,7 @@ class Product {
   int? remise;
   int quantite;
   int remain;
+  int? free;
   int nbTest;
   bool? rest;
   bool? perom;
@@ -46,6 +45,7 @@ class Product {
       this.remise,
       required this.quantite,
       required this.remain,
+      this.free,
       required this.nbTest,
       required this.period,
       required this.seuil,
@@ -58,6 +58,7 @@ class Product {
       "fournisseur": fournisseur,
       "quantite": quantite,
       "rest": remain,
+      "qfree": free ?? 0,
       "nb_test": nbTest,
       "ht": prixHT,
       "tva": prixTVA,
@@ -91,6 +92,7 @@ class Product {
       remain: map['rest'],
       remise: map['remise'] ?? 0,
       period: map['period'] ?? 0,
+      free: map['qfree'] ?? 0,
       seuil: map['seuil'],
     );
   }
@@ -115,17 +117,23 @@ class Product {
     return remise!.toString() + " %";
   }
 
+  String getfree() {
+    if (free == null) {
+      return "0";
+    } else {
+      return free.toString();
+    }
+  }
+
   bool calculeRest() {
     rest = remain > seuil ? false : true;
-
-    if (rest == true) {
-      notification(product);
-    }
-    verificationDate();
+    // if (rest == true) {
+    //   notification(product);
+    // }
     return rest!;
   }
 
-  void verificationDate() {
+  bool verificationDate() {
     perom = false;
     var dateTime1 = DateTime.now();
     var dateTime2 =
@@ -138,10 +146,12 @@ class Product {
     } else {
       perom = false;
     }
-    if (perom == true) {
-      notificationDate(product);
-    }
+    // if (perom == true) {
+    //   notificationDate(product);
+    // }
+    return perom!;
   }
+
   /*
    *
    *  Notifications for windows 
@@ -208,9 +218,9 @@ class ProductProvider {
 
     db = await databaseFactory.openDatabase(path);
     return await db.delete("product", where: 'id = ?', whereArgs: [id]);
-     
   }
 }
+
 /*
  * 
  *  Below class to return the product's rows for the Datatable widget 
@@ -244,9 +254,8 @@ class ProductDataSource extends m.DataTableSource {
   }
 
   DataRow2 RowMethod(Product row, int index) {
-   
     return DataRow2(
-        color: row.calculeRest() == true
+        color: row.calculeRest() == true || row.verificationDate()
             ? m.MaterialStateProperty.all<Color>(Colors.red.lightest)
             : null,
         specificRowHeight: 100,
@@ -260,6 +269,7 @@ class ProductDataSource extends m.DataTableSource {
           m.DataCell(Text(row.refactorTTCu())),
           m.DataCell(Text(row.refactorTTCt())),
           m.DataCell(Text(row.refactorRemise())),
+          m.DataCell(Text(row.getfree())),
           m.DataCell(Text(
             row.seuil.toString(),
           )),
@@ -306,4 +316,15 @@ class ProductDataSource extends m.DataTableSource {
 
   @override
   int get selectedRowCount => 0;
+
+  void sort<T>(Comparable<T> Function(Product d) getField, bool ascending) {
+    list.sort((a, b) {
+      final aValue = getField(a);
+      final bValue = getField(b);
+      return ascending
+          ? Comparable.compare(aValue, bValue)
+          : Comparable.compare(bValue, aValue);
+    });
+    notifyListeners();
+  }
 }

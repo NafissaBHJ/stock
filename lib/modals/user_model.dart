@@ -83,7 +83,7 @@ class UserProvider {
     SET password = ?
     WHERE id = ?
     ''', [pw, id]);
-    
+
     await db.close();
   }
 
@@ -97,9 +97,13 @@ typedef OnRowSelect = void Function(int index);
 
 class UserDataSourceTable extends m.DataTableSource {
   UserDataSourceTable(
-      {required this.list, required this.updatePw, required this.delete});
+      {required this.list,
+      required this.updatePw,
+      required this.delete,
+      required this.deleteH});
   List<User> list;
   final OnRowSelect updatePw;
+  final OnRowSelect deleteH;
   final OnRowSelect delete;
   @override
   m.DataRow? getRow(int index) {
@@ -129,6 +133,12 @@ class UserDataSourceTable extends m.DataTableSource {
               "Modifier MP",
             ),
             onPressed: () => updatePw(index),
+          ),
+          Button(
+            child: const Text(
+              "Supprimer historique",
+            ),
+            onPressed: () => deleteH(index),
           ),
           Button(
             child: const Text(

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
@@ -11,12 +12,15 @@ import 'package:stock/screens/notifiers/user_notifier.dart';
 import '../../modals/data_model.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
+import '../../modals/sort_model.dart';
+
 class ListManager {
   final dataNotifier = ProductNotifier();
   final historyNotifier = ValueNotifier<List<History>>([]);
   final fonctionalityNotfier = ValueNotifier<int>(0);
   final userNotifier = UserNotifier();
   final isUserNotifier = ValueNotifier<bool>(true);
+  final sortNotifier = ValueNotifier<Sort>(Sort());
 
   Future<void> init() async {
     dataNotifier.initialize();
@@ -76,9 +80,25 @@ class ListManager {
     await userNotifier.deleteUser(id);
   }
 
+  Future<void> deleteUserHistory(String t) async {
+    await userNotifier.deleteUserH(t);
+  }
+
   void updateFunction(dynamic v) {
     fonctionalityNotfier.value = v;
     fonctionalityNotfier.notifyListeners();
+  }
+
+  void sort<T>(ProductDataSource data,
+      Comparable<T> Function(Product d) getField, int index, bool ascending) {
+    updateSortNotifier(index, ascending);
+    data.sort<T>(getField, ascending);
+  }
+
+  void updateSortNotifier(int index, bool asc) {
+    sortNotifier.value.asc = asc;
+    sortNotifier.value.index = index;
+    sortNotifier.notifyListeners();
   }
 
   Future<void> generateExcel() async {
@@ -96,6 +116,7 @@ class ListManager {
     sheet.getRangeByName('I' + i.toString()).setText("nombre Test");
     sheet.getRangeByName('J' + i.toString()).setText("Date d'achat");
     sheet.getRangeByName('K' + i.toString()).setText("Date péromption");
+    sheet.getRangeByName('L' + i.toString()).setText("Quantité gratuite");
 
     i = 2;
     dataNotifier.value.forEach((element) {
@@ -124,6 +145,7 @@ class ListManager {
           .setText(element.nbTest.toString());
       sheet.getRangeByName('J' + i.toString()).setText(element.dateAchat);
       sheet.getRangeByName('K' + i.toString()).setText(element.datePerom);
+      sheet.getRangeByName('L' + i.toString()).setText(element.getfree());
 
       i++;
     });

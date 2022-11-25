@@ -20,4 +20,5 @@ abstract class StorageService {
   Future<void> updatePassword(int id,String str) async {}
 
   Future<void> deleteUser(int id) async {} 
+  Future<void> deleteUserHistory(String name) async {} 
 }

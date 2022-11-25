@@ -1,7 +1,9 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
+import 'package:stock/modals/sort_model.dart';
 import 'package:stock/screens/form/form_screen.dart';
+import 'package:stock/screens/form/form_screen_manager.dart';
 import 'package:stock/screens/list/list_screen_manager.dart';
 import 'package:stock/services/service_locator.dart';
 import 'package:stock/utils/widgets/input_widget.dart';
@@ -18,6 +20,9 @@ class ListScreen extends StatefulWidget {
 
 class _ListScreenState extends State<ListScreen> {
   final stateManager = getIt<ListManager>();
+  late ProductDataSource source;
+  bool _sortAscending = true;
+  int? _sortColumnIndex;
 
   @override
   void initState() {
@@ -30,7 +35,7 @@ class _ListScreenState extends State<ListScreen> {
     return ValueListenableBuilder<List<Product>>(
         valueListenable: stateManager.dataNotifier,
         builder: ((context, value, child) {
-          material.DataTableSource source = ProductDataSource(
+          source = ProductDataSource(
               productList: value,
               value: stateManager.dataNotifier.idNotifier.value!,
               update: (index) => modify(context, value[index]),
@@ -40,101 +45,113 @@ class _ListScreenState extends State<ListScreen> {
                 history(context, value[index]);
               }),
               take: (index) => take(context, value[index]));
-          return SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: material.Material(
-              child: value.isNotEmpty
-                  ? PaginatedDataTable2(
-                      header: SearchWidget(),
-                      actions: [
-                        SizedBox(
-                          width: 100,
-                          child: Button(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: const [
-                                Icon(FluentIcons.refresh),
-                                Text("Refresh")
-                              ],
-                            ),
-                            onPressed: () => stateManager.getData(),
-                          ),
-                        ),
-                        SizedBox(
+          return ValueListenableBuilder<Sort>(
+            builder: (context, value, child) {
+              return SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                child: material.Material(
+                    child: PaginatedDataTable2(
+                        sortAscending: value.asc!,
+                        sortColumnIndex: value.index,
+                        header: SearchWidget(),
+                        actions: [
+                          SizedBox(
                             width: 100,
                             child: Button(
-                              onPressed: () => stateManager.generateExcel(),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
                                 children: const [
-                                  Icon(FluentIcons.download_document),
-                                  Text("Excel ")
+                                  Icon(FluentIcons.refresh),
+                                  Text("Refresh")
                                 ],
                               ),
-                            ))
-                      ],
-                      columnSpacing: 10,
-                      horizontalMargin: 10,
-                      minWidth: 600,
-                      columns: const [
-                        DataColumn2(
-                          label: Text('Produit'),
-                        ),
-                        DataColumn2(
-                          label: Text('Quantité'),
-                          size: ColumnSize.S,
-                          numeric: true,
-                        ),
-                        DataColumn2(
-                          label: Text('Q Rest'),
-                          size: ColumnSize.S,
-                          numeric: true,
-                        ),
-                        DataColumn2(
-                          label: Text('Nombre test'),
-                          size: ColumnSize.S,
-                          numeric: true,
-                        ),
-                        DataColumn2(
-                          label: Text('Prix HT'),
-                          numeric: true,
-                        ),
-                        DataColumn2(
-                          label: Text('TVA'),
-                          numeric: true,
-                        ),
-                        DataColumn2(
-                          label: Text('Prix U TTC'),
-                          numeric: true,
-                        ),
-                        DataColumn2(
-                          label: Text('Prix T TTC'),
-                          numeric: true,
-                        ),
-                        DataColumn2(
-                          label: Text('Remise'),
-                          numeric: true,
-                        ),
-                        DataColumn2(
-                          label: Text('Seuil'),
-                          size: ColumnSize.S,
-                          numeric: true,
-                        ),
-                        DataColumn2(
-                          label: Text('Date d\'achat'),
-                        ),
-                        DataColumn2(
-                          label: Text('Date péremption'),
-                        ),
-                        DataColumn2(
-                          label: Text('Action'),
-                        ),
-                      ],
-                      source: source)
-                  : const NodataWidget(),
-            ),
+                              onPressed: () => stateManager.getData(),
+                            ),
+                          ),
+                          SizedBox(
+                              width: 100,
+                              child: Button(
+                                onPressed: () => stateManager.generateExcel(),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: const [
+                                    Icon(FluentIcons.download_document),
+                                    Text("Excel ")
+                                  ],
+                                ),
+                              ))
+                        ],
+                        columnSpacing: 10,
+                        horizontalMargin: 10,
+                        minWidth: 600,
+                        columns: [
+                          DataColumn2(
+                            label: Text('Produit'),
+                          ),
+                          DataColumn2(
+                            label: Text('Quantité'),
+                            size: ColumnSize.S,
+                            numeric: true,
+                          ),
+                          DataColumn2(
+                            label: Text('Q Rest'),
+                            size: ColumnSize.S,
+                            numeric: true,
+                          ),
+                          DataColumn2(
+                            label: Text('Nombre test'),
+                            size: ColumnSize.S,
+                            numeric: true,
+                          ),
+                          DataColumn2(
+                            label: Text('Prix HT'),
+                            numeric: true,
+                          ),
+                          DataColumn2(
+                            label: Text('TVA'),
+                            numeric: true,
+                          ),
+                          DataColumn2(
+                            label: Text('Prix U TTC'),
+                            numeric: true,
+                          ),
+                          DataColumn2(
+                            label: Text('Prix T TTC'),
+                            numeric: true,
+                          ),
+                          DataColumn2(
+                            label: Text('Remise'),
+                            numeric: true,
+                          ),
+                          DataColumn2(
+                            label: Text('Q gratuite'),
+                            numeric: true,
+                          ),
+                          DataColumn2(
+                            label: Text('Seuil'),
+                            size: ColumnSize.S,
+                            numeric: true,
+                          ),
+                          DataColumn2(
+                            label: Text('Date d\'achat'),
+                          ),
+                          DataColumn2(
+                              label: Text('Date péremption'),
+                              onSort: (columnIndex, ascending) {
+                                stateManager.sort(source, (d) => d.datePerom,
+                                    columnIndex, ascending);
+                              }),
+                          DataColumn2(
+                            label: Text('Action'),
+                          ),
+                        ],
+                        source: source)),
+              );
+            },
+            valueListenable: stateManager.sortNotifier,
           );
         }));
   }
@@ -206,7 +223,7 @@ class _ListScreenState extends State<ListScreen> {
             return ContentDialog(
               title: const Text("Consommation"),
               content: SizedBox(
-                height: 350,
+                height: 300,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.min,
@@ -220,10 +237,18 @@ class _ListScreenState extends State<ListScreen> {
                         field: "Username",
                         input: "Entrer votre nom d'utilisateur",
                         controller: c1),
-                    InputWidget(
-                        field: "Password",
-                        input: "Entrer votre mot de passe",
-                        controller: c2),
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: TextFormBox(
+                          controller: c2,
+                          header: "Mot de passe",
+                          placeholder: "Entrer votre mot de passe",
+                          obscureText: true,
+                          validator: (value) => FormManager().validate(value),
+                          onEditingComplete: () {
+                            FocusScope.of(context).nextFocus();
+                          }),
+                    ),
                   ],
                 ),
               ),
@@ -231,7 +256,7 @@ class _ListScreenState extends State<ListScreen> {
                 TextButton(
                     onPressed: (() {
                       stateManager.saveHistory(p, c3.text, c1.text, c2.text);
-                       Navigator.pop(context);
+                      Navigator.pop(context);
                     }),
                     child: const Text("Enregister"))
               ],

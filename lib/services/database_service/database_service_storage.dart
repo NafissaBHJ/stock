@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
@@ -31,13 +32,21 @@ class DatabaseServiceStorage extends StorageService {
   }
 
   Future<void> open(String path) async {
-    db = await databaseFactory.openDatabase(path);
+    db = await databaseFactory.openDatabase(path,
+        options: OpenDatabaseOptions(
+          version: 1,
+          onUpgrade: (db, oldVersion, newVersion) async {
+            if (oldVersion < newVersion) {
+              await db.execute('ALTER TABLE product ADD qfree INTEGER NULL');
+            }
+          },
+        ));
   }
+
   /*
    * Creates tables the first time only 
    */
   Future<void> createTables() async {
-
     await db.execute('PRAGMA foreign_keys = ON');
     await db.execute('''
       CREATE TABLE if not exists product (
@@ -79,7 +88,7 @@ class DatabaseServiceStorage extends StorageService {
       )
     ''');
 
-    List users= await db.query('user');
+    List users = await db.query('user');
 
     if (users.isEmpty) {
       await db.rawInsert(
@@ -151,7 +160,7 @@ class DatabaseServiceStorage extends StorageService {
   }
 
   @override
-  Future<void> insertUser( User user) async {
+  Future<void> insertUser(User user) async {
     await userProvider.insert(user, _path);
   }
 
@@ -163,5 +172,10 @@ class DatabaseServiceStorage extends StorageService {
   @override
   Future<void> deleteUser(int id) async {
     await userProvider.deleteUser(id, _path);
+  }
+
+  @override
+  Future<void> deleteUserHistory(String name) async {
+    await historyProvider.deleteUserHistory(name, _path);
   }
 }

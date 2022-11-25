@@ -68,4 +68,10 @@ class HistoryProvider {
     db = await databaseFactory.openDatabase(path);
     return await db.delete("history", where: 'product_id = ?', whereArgs: [id]);
   }
+
+  Future<int> deleteUserHistory(String name, String path) async {
+    databaseFactory = databaseFactoryFfi;
+    db = await databaseFactory.openDatabase(path);
+    return await db.delete("history", where: 'user = ?', whereArgs: [name]);
+  }
 }

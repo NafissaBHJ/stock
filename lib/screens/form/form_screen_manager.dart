@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:stock/modals/data_model.dart';
+import 'package:stock/modals/history_model.dart';
 import 'package:stock/screens/notifiers/product_notifier.dart';
 import 'package:stock/services/database_service/storage_service.dart';
 
@@ -115,25 +116,20 @@ class FormManager {
       String rest,
       String period,
       String free) {
-    // if you modify quantite 
+    // if you modify quantite
     int ttct = 0;
-    int added = 0;
+    int qG = 0;
     int rest2 = 0;
-  
-    if (int.parse(quantite) == prod.quantite) {
-      rest2 = int.parse(rest);
-      added = prod.quantite;
-      ttct = (int.parse(ttc) * (int.parse(quantite) - int.parse(free)));
-    } else {
-      rest2 = prod.remain + (int.parse(quantite) - prod.quantite);
-      added = int.parse(quantite);
-      if (int.parse(free) != prod.free) {
-        ttct = (int.parse(ttc) * (int.parse(quantite) - int.parse(free)));
-      } else {
-        ttct = (int.parse(ttc) * (int.parse(quantite) - prod.free!));
-      }
-    }
 
+    rest2 = prod.remain + int.parse(quantite);
+    qG = prod.quantite + int.parse(quantite);
+    if (int.parse(free) != prod.free) {
+      ttct = (int.parse(ttc) * (qG - int.parse(free)));
+    } else {
+      ttct = (int.parse(ttc) * (qG - prod.free!));
+    }
+    History h = History(null, prod.id, 'admin', int.parse(quantite),
+        DateFormat.yMd('fr').format(DateTime.now()));
     Product p = Product(
       product: name,
       fournisseur: fournisseur,
@@ -142,17 +138,19 @@ class FormManager {
       fusion: 0,
       prixHT: int.parse(ht),
       prixTVA: int.parse(tva),
-      quantite: added,
+      quantite: qG,
       remain: rest2,
       nbTest: int.parse(nbTest),
       period: int.parse(period),
       seuil: int.parse(seuil),
       remise: int.parse(remise),
-      free:  int.parse(free),
+      free: int.parse(free),
       dateAchat: DateFormat.yMd('fr').format(time1),
       datePerom: DateFormat.yMd('fr').format(time2),
     );
     productNotofier.updateData(prod.id!, p);
+
+    productNotofier.updateProductHistoryAdmin(h);
   }
 
   void calculeTTC() {

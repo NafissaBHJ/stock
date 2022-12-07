@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' as mat;
 
 import 'package:stock/screens/form/form_screen.dart';
 import 'package:stock/screens/home/home_screen_manager.dart';
+import 'package:stock/screens/list/list_daily_product.dart';
 import 'package:stock/screens/list/list_screen.dart';
 import 'package:stock/screens/list/list_user_screen.dart';
 import 'package:stock/services/service_locator.dart';
@@ -52,7 +53,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   onChanged: ((val) {
                     stateManager.updateIndex(val);
                   }),
-              
                   items: stateManager.homeNotifier.value.userId == 1
                       ? [
                           PaneItem(
@@ -62,6 +62,13 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                               title: const Text("Stock liste"),
                               body: ListScreen()),
+                          // PaneItem(
+                          //     icon: const Icon(
+                          //       FluentIcons.calendar_agenda,
+                          //       size: 18,
+                          //     ),
+                          //     title: const Text("Daily Stock liste"),
+                          //     body: DailyProductList()),
                           PaneItem(
                               icon: const Icon(
                                 FluentIcons.add_to_shopping_list,

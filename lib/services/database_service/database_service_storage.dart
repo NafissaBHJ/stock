@@ -34,10 +34,10 @@ class DatabaseServiceStorage extends StorageService {
   Future<void> open(String path) async {
     db = await databaseFactory.openDatabase(path,
         options: OpenDatabaseOptions(
-          version: 1,
+          version: 2,
           onUpgrade: (db, oldVersion, newVersion) async {
             if (oldVersion < newVersion) {
-              await db.execute('ALTER TABLE product ADD qfree INTEGER NULL');
+              await db.execute('ALTER TABLE product ADD updated_at TEXT NULL');
             }
           },
         ));
@@ -154,6 +154,11 @@ class DatabaseServiceStorage extends StorageService {
   }
 
   @override
+  Future<void> updateHistoryEntry(History h) async {
+    await historyProvider.insertHistory(h, _path);
+  }
+
+  @override
   Future<List<History>?> getHistory(int id) async {
     List<History>? hList = await historyProvider.getHistory(id, _path);
     return hList;
@@ -177,5 +182,31 @@ class DatabaseServiceStorage extends StorageService {
   @override
   Future<void> deleteUserHistory(String name) async {
     await historyProvider.deleteUserHistory(name, _path);
+  }
+
+  @override
+  Future<List?> getRecordByUser(String str) async {
+    List? historyL = await historyProvider.getHistoryByUser(str, _path);
+ 
+    return historyL;
+  }
+
+  @override
+  Future<List<History>?> getHistoryByProduct(int id) async {
+    List<History>? historyL =
+        await historyProvider.getHistoryByProduct(id, _path) ?? [];
+
+    return historyL;
+  }
+
+  @override
+  Future<List?> searchProduct(String name) async {
+    List<Product>? productSearch = await _pProvider.search(name, _path);
+    return productSearch;
+  }
+
+  @override
+  Future<void> deleteRecordHistory(int id) async {
+    await historyProvider.deleteRecordHistory(id, _path);
   }
 }

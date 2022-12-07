@@ -100,11 +100,13 @@ class UserDataSourceTable extends m.DataTableSource {
       {required this.list,
       required this.updatePw,
       required this.delete,
+      required this.excel,
       required this.deleteH});
   List<User> list;
   final OnRowSelect updatePw;
   final OnRowSelect deleteH;
   final OnRowSelect delete;
+  final OnRowSelect excel;
   @override
   m.DataRow? getRow(int index) {
     final row = list[index];
@@ -121,7 +123,7 @@ class UserDataSourceTable extends m.DataTableSource {
   int get selectedRowCount => 0;
 
   DataRow2 rowMethod(User row, int index) {
-    return DataRow2(specificRowHeight: 100, cells: [
+    return DataRow2(specificRowHeight: 130, cells: [
       m.DataCell(Text(row.username)),
       m.DataCell(Text(row.replacePw())),
       m.DataCell(Text(row.job())),
@@ -146,6 +148,7 @@ class UserDataSourceTable extends m.DataTableSource {
             ),
             onPressed: () => delete(index),
           ),
+          Button(child: const Text(' Excel '), onPressed: (() => excel(index)))
         ],
       ))
     ]);

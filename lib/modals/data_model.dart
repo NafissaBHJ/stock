@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:data_table_2/data_table_2.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as m;
@@ -32,6 +34,7 @@ class Product {
   int period;
   String dateAchat;
   String datePerom;
+  String? updatedAt;
 
   Product(
       {this.id,
@@ -50,7 +53,8 @@ class Product {
       required this.period,
       required this.seuil,
       required this.dateAchat,
-      required this.datePerom});
+      required this.datePerom,
+      this.updatedAt});
 
   Map<String, Object?> toMap() {
     var map = <String, Object?>{
@@ -70,7 +74,8 @@ class Product {
       "period": period,
       "seuil": seuil,
       "date_achat": dateAchat,
-      "date_peromp": datePerom
+      "date_peromp": datePerom,
+      "updated_at": updatedAt ?? "",
     };
     return map;
   }
@@ -94,6 +99,7 @@ class Product {
       period: map['period'] ?? 0,
       free: map['qfree'] ?? 0,
       seuil: map['seuil'],
+      updatedAt: map['updated_at'],
     );
   }
 
@@ -133,6 +139,14 @@ class Product {
     return rest!;
   }
 
+  DateTime stringToDateP() {
+    return DateFormat('d/MM/y').parse(datePerom);
+  }
+
+  DateTime stringToDateA() {
+    return DateFormat('d/MM/y').parse(dateAchat);
+  }
+
   bool verificationDate() {
     perom = false;
     var dateTime1 = DateTime.now();
@@ -157,19 +171,7 @@ class Product {
    *  Notifications for windows 
    * 
   */
-  Future<void> notification(String name) async {
-    final toast = await WinToast.instance().showToast(
-        type: ToastType.text01,
-        title: "Le seuil de notification est atteint  pour le produit $name!");
-    assert(toast != null);
-  }
 
-  Future<void> notificationDate(String name) async {
-    final toast = await WinToast.instance().showToast(
-        type: ToastType.text01,
-        title: "La Date de Péremption pour le produit $name est Proche !");
-    assert(toast != null);
-  }
 }
 
 /*
@@ -205,6 +207,24 @@ class ProductProvider {
     return List<Product>.from(products.map((e) => Product.fromMap(e)).toList());
   }
 
+  Future<List<Product>> getProductsByDate(String date, String path) async {
+    databaseFactory = databaseFactoryFfi;
+    db = await databaseFactory.openDatabase(path);
+    var products =
+        await db.rawQuery('SELECT * from product where updated_at=?', [date]);
+    await db.close();
+    return List<Product>.from(products.map((e) => Product.fromMap(e)).toList());
+  }
+
+  Future<List<Product>?> search(String str, String path) async {
+    databaseFactory = databaseFactoryFfi;
+    db = await databaseFactory.openDatabase(path);
+    var products = await db
+        .rawQuery('''SELECT * from product WHERE produit LIKE '%$str%' ''');
+    await db.close();
+    return List<Product>.from(products.map((e) => Product.fromMap(e)).toList());
+  }
+
   Future<void> updateProduct(String path, int id, Product p) async {
     databaseFactory = databaseFactoryFfi;
     db = await databaseFactory.openDatabase(path);
@@ -235,6 +255,7 @@ class ProductDataSource extends m.DataTableSource {
       required this.delete,
       required this.take,
       required this.history,
+      required this.excel,
       required this.value})
       : list = productList;
 
@@ -243,6 +264,7 @@ class ProductDataSource extends m.DataTableSource {
   final OnRowSelect delete;
   final OnRowSelect take;
   final OnRowSelect history;
+  final OnRowSelect excel;
   final int value;
   final storage = getIt<StorageService>();
 
@@ -258,7 +280,7 @@ class ProductDataSource extends m.DataTableSource {
         color: row.calculeRest() == true || row.verificationDate()
             ? m.MaterialStateProperty.all<Color>(Colors.red.lightest)
             : null,
-        specificRowHeight: 100,
+        specificRowHeight: 120,
         cells: [
           m.DataCell(Text(row.product)),
           m.DataCell(Text((row.quantite).toString())),
@@ -290,6 +312,12 @@ class ProductDataSource extends m.DataTableSource {
                         "Historique",
                       ),
                       onPressed: () => history(index),
+                    ),
+                    Button(
+                      child: const Text(
+                        "  Excel   ",
+                      ),
+                      onPressed: () => excel(index),
                     ),
                     Button(
                       child: const Text("Supprimer"),

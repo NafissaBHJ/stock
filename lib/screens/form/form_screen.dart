@@ -25,8 +25,7 @@ class _FormScreenState extends State<FormScreen> {
       TextEditingController(text: p == null ? null : p!.seuil.toString());
   late var controllerE =
       TextEditingController(text: p == null ? null : p!.period.toString());
-  late var controllerC1 =
-      TextEditingController(text: p == null ? null : p!.quantite.toString());
+  late var controllerC1 = TextEditingController();
   late var controllerC2 =
       TextEditingController(text: p == null ? null : p!.nbTest.toString());
   late var controllerTVA =
@@ -114,8 +113,6 @@ class _FormScreenState extends State<FormScreen> {
                     ),
                     ValueListenableBuilder<int>(
                       builder: (BuildContext context, value, Widget? child) {
-                        print(controllerTTC.text);
-                        print("val$value");
                         controllerTTC.text = value.toString();
                         return InputNumberWidget(
                           field: "Prix TTC",
@@ -132,12 +129,9 @@ class _FormScreenState extends State<FormScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     InputNumberWidget(
-                      controller: controllerC1,
-                      field: "Quantité",
-                      input: 
-                           'Entrer la quantitée globale'
-                         
-                    ),
+                        controller: controllerC1,
+                        field: "Quantité à ajouter",
+                        input: 'Entrer la quantitée globale'),
                     InputNumberWidget(
                       controller: controllerC2,
                       field: "Nombre de tests",
@@ -179,10 +173,12 @@ class _FormScreenState extends State<FormScreen> {
                   children: [
                     TimePickerWidget(
                       value: "Date Achat",
+                      actualTime: p != null ? p!.stringToDateA() : null,
                       time: time1,
                     ),
                     TimePickerWidget(
                       value: "Date Péromption",
+                      actualTime: p != null ? p!.stringToDateP() : null,
                       time: time2,
                     ),
                   ],
@@ -350,10 +346,15 @@ class Counter extends StatelessWidget {
 }
 
 class TimePickerWidget extends StatefulWidget {
-  TimePickerWidget({Key? key, required String value, required this.time})
+  TimePickerWidget(
+      {Key? key,
+      required String value,
+      required this.time,
+      required this.actualTime})
       : title = value,
         super(key: key);
   final String title;
+  final DateTime? actualTime;
   int time;
 
   @override
@@ -362,7 +363,8 @@ class TimePickerWidget extends StatefulWidget {
 
 class _TimePickerWidgetState extends State<TimePickerWidget> {
   final state = getIt<FormManager>();
-  DateTime time = DateTime.now();
+  late DateTime time =
+      widget.actualTime != null ? widget.actualTime! : DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -376,10 +378,31 @@ class _TimePickerWidgetState extends State<TimePickerWidget> {
             setState(() {
               time = value;
             });
+
             if (widget.time == 1) {
-              state.time1 = value;
+              if (widget.actualTime == null) {
+                state.time1 = value;
+              } else {
+                if ((value.day > widget.actualTime!.day) ||
+                    (value.month >= widget.actualTime!.month) ||
+                    (value.year >= widget.actualTime!.year)) {
+                  state.time1 = value;
+                } else {
+                  state.time1 = widget.actualTime!;
+                }
+              }
             } else {
-              state.time2 = value;
+              if (widget.actualTime == null) {
+                state.time2 = value;
+              } else {
+                if ((value.day > widget.actualTime!.day) ||
+                    (value.month >= widget.actualTime!.month) ||
+                    (value.year >= widget.actualTime!.year)) {
+                  state.time2 = value;
+                } else {
+                  state.time2 = widget.actualTime!;
+                }
+              }
             }
           },
         ),

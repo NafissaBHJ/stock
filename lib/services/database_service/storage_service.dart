@@ -14,11 +14,22 @@ abstract class StorageService {
   Future<List<User>> getUsers() async {
     return [];
   }
+
   Future<void> updateHistory(History h, int id, int pq) async {}
+  Future<void> updateHistoryEntry(
+    History h,
+  ) async {}
+
   Future<List<History>?> getHistory(int id) async {}
   Future<void> insertUser(User user) async {}
-  Future<void> updatePassword(int id,String str) async {}
+  Future<void> updatePassword(int id, String str) async {}
 
-  Future<void> deleteUser(int id) async {} 
-  Future<void> deleteUserHistory(String name) async {} 
+  Future<void> deleteUser(int id) async {}
+  Future<void> deleteUserHistory(String name) async {}
+  Future<void> deleteRecordHistory(int id) async {}
+
+  Future<List<dynamic>?> getRecordByUser(String name) async {}
+
+  Future<List<History>?> getHistoryByProduct(int id) async {}
+  Future<List<dynamic>?> searchProduct(String name) async {}
 }

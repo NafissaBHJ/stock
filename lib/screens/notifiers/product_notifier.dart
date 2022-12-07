@@ -37,7 +37,7 @@ class ProductNotifier extends ValueNotifier<List<Product>> {
 
   Future<void> updateData(int id, Product p) async {
     await _storageService.update(id, p);
-  //  / getData();
+    //  / getData();
   }
 
   Future<void> deleteData(int id) async {
@@ -45,13 +45,14 @@ class ProductNotifier extends ValueNotifier<List<Product>> {
     getData();
   }
 
-  void search(String p) {
+  Future<void> search(String p) async {
     List<Product>? result = [];
-    value.forEach((element) {
-      if (element.product.toLowerCase().contains(p.toLowerCase())) {
-        result.add(element);
-      }
-    });
+    // value.forEach((element) {
+    //   if (element.product.toLowerCase().contains(p.toLowerCase())) {
+    //     result.add(element);
+    //   }
+    // });
+    result = await searchProduct(p);
     if (result != null) {
       value = result;
       notifyListeners();
@@ -66,8 +67,38 @@ class ProductNotifier extends ValueNotifier<List<Product>> {
     getData();
   }
 
+  Future<void> updateProductHistoryAdmin(History h) async {
+    await _storageService.updateHistoryEntry(h);
+    getData();
+  }
+
   Future<List<History>?> getHistory(int id) async {
     List<History>? l = await _storageService.getHistory(id);
+
     return l;
+  }
+
+  Future<List<History>?> getHistoryByProduct(int id) async {
+    List<History>? l =
+        (await _storageService.getHistoryByProduct(id))?.cast<History>() ?? [];
+
+    return l;
+  }
+
+  Future<List?> getRecordsByUser(String user) async {
+    List? l = (await _storageService.getRecordByUser(user))?.toList() ?? [];
+
+    print(l);
+    return l;
+  }
+
+  Future<List<Product>?> searchProduct(String str) async {
+    List<Product>? l =
+        (await _storageService.searchProduct(str))?.cast<Product>() ?? [];
+    return l;
+  }
+
+  Future<void> deleteRecordHistory(int id) async {
+    await _storageService.deleteRecordHistory(id);
   }
 }

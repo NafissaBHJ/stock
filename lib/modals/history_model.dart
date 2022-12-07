@@ -14,7 +14,7 @@ class History {
   int? productid;
   String? date;
 
-  History(this.productid, this.name, this.quantite, this.date);
+  History(this.id, this.productid, this.name, this.quantite, this.date);
   Map<String, Object?> toMap() {
     var map = <String, Object?>{
       "user": name,
@@ -26,7 +26,8 @@ class History {
   }
 
   factory History.fromMap(dynamic map) {
-    return History(map['id'], map['user'], map['quantite'], map['date']);
+    return History(map['id'], map['product_id'], map['user'], map['quantite'],
+        map['date']);
   }
 }
 
@@ -35,10 +36,10 @@ class HistoryProvider {
   late DatabaseFactory databaseFactorys;
 
   Future<void> insertHistory(History h, String path) async {
-    var databaseFactory = databaseFactoryFfi;
+    databaseFactory = databaseFactoryFfi;
     db = await databaseFactory.openDatabase(path);
     var value = h.toMap();
-    db.insert("history", value);
+    await db.insert("history", value);
     await db.close();
   }
 
@@ -63,10 +64,37 @@ class HistoryProvider {
     return List<History>.from(productH.map((e) => History.fromMap(e)).toList());
   }
 
+  Future<List?> getHistoryByUser(String user, String path) async {
+    var databaseFactory = databaseFactoryFfi;
+    db = await databaseFactory.openDatabase(path);
+    var productH = await db.rawQuery(
+        'SELECT  history.user,history.quantite, history.date,product.produit FROM history left join product on history.product_id=product.id WHERE  history.user =?',
+        [user]);
+
+    await db.close();
+    return List.from(productH).toList();
+  }
+
+  Future<List<History>?> getHistoryByProduct(int id, String path) async {
+    var databaseFactory = databaseFactoryFfi;
+    db = await databaseFactory.openDatabase(path);
+    var productH =
+        await db.rawQuery('SELECT  * FROM history WHERE  product_id =?', [id]);
+
+    await db.close();
+    return List<History>.from(productH.map((e) => History.fromMap(e)).toList());
+  }
+
   Future<int> deleteProductHistory(int id, String path) async {
     databaseFactory = databaseFactoryFfi;
     db = await databaseFactory.openDatabase(path);
     return await db.delete("history", where: 'product_id = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteRecordHistory(int id, String path) async {
+    databaseFactory = databaseFactoryFfi;
+    db = await databaseFactory.openDatabase(path);
+    return await db.delete("history", where: 'id = ?', whereArgs: [id]);
   }
 
   Future<int> deleteUserHistory(String name, String path) async {

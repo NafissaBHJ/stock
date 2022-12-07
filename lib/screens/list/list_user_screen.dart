@@ -29,6 +29,7 @@ class _UserListScreenState extends State<UserListScreen> {
             delete: ((index) => delete(context, value[index])),
             list: value,
             updatePw: (index) => modifyPw(context, value[index]),
+            excel: ((index) => excel(context, value[index])),
             deleteH: ((index) => deleteH(value[index])));
 
         return SizedBox(
@@ -186,7 +187,7 @@ class _UserListScreenState extends State<UserListScreen> {
   }
 
   deleteH(User u) {
-      var stateManager = getIt<ListManager>();
+    var stateManager = getIt<ListManager>();
 
     return showDialog(
         context: (context),
@@ -194,12 +195,19 @@ class _UserListScreenState extends State<UserListScreen> {
         builder: ((context) {
           return ContentDialog(
               title: const Text("Suppression"),
-              content: Text("Vous voulez vraiment supprimer l'historique de ${u.username}"),
+              content: Text(
+                  "Vous voulez vraiment supprimer l'historique de ${u.username}"),
               actions: [
                 TextButton(
-                    onPressed: (() => stateManager.deleteUserHistory(u.username!)),
+                    onPressed: (() =>
+                        stateManager.deleteUserHistory(u.username!)),
                     child: const Text('Supprimer'))
               ]);
         }));
+  }
+
+  excel(BuildContext context, User user) {
+    var stateManager = getIt<ListManager>();
+    stateManager.generateExcelUser(user.username);
   }
 }

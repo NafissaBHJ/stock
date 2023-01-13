@@ -13,7 +13,6 @@ import 'package:stock/utils/helpers.dart';
 import '../../modals/data_model.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
-import '../../modals/sort_model.dart';
 
 enum ListType { daily, all }
 
@@ -23,7 +22,6 @@ class ListManager {
   final fonctionalityNotfier = ValueNotifier<int>(0);
   final userNotifier = UserNotifier();
   final isUserNotifier = ValueNotifier<bool>(true);
-  final sortNotifier = ValueNotifier<Sort>(Sort());
   final dailyListNotifier = ProductNotifier();
 
   Future<void> init() async {
@@ -55,14 +53,19 @@ class ListManager {
     }
   }
 
+  void searchByDate(String date) {
+    if (date.isNotEmpty) {
+      dataNotifier.searchByDate(date);
+    }
+  }
+
   void getData() {
     dataNotifier.getData();
   }
 
   Future<void> saveHistory(
-      Product p, String quantite, String name, String password) async {
+    Product p, String quantite, String name, String password) async {
     isUserNotifier.value = await userNotifier.verifyUser(name, password);
-    print(isUserNotifier.value);
     isUserNotifier.notifyListeners();
 
     if (isUserNotifier.value == true) {
@@ -103,17 +106,9 @@ class ListManager {
     fonctionalityNotfier.notifyListeners();
   }
 
-  void sort<T>(ProductDataSource data,
-      Comparable<T> Function(Product d) getField, int index, bool ascending) {
-    updateSortNotifier(index, ascending);
-    data.sort<T>(getField, ascending);
-  }
+  
 
-  void updateSortNotifier(int index, bool asc) {
-    sortNotifier.value.asc = asc;
-    sortNotifier.value.index = index;
-    sortNotifier.notifyListeners();
-  }
+
 
   Future<void> generateExcel(ListType type, Product? pr) async {
     final Workbook workbook = Workbook();

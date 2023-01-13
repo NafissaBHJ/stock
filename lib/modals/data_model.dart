@@ -1,14 +1,10 @@
-import 'dart:math';
-
 import 'package:data_table_2/data_table_2.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as m;
 import 'package:intl/intl.dart';
 
 import 'package:sqflite/sqflite.dart';
-
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:win_toast/win_toast.dart';
 
 import '../services/database_service/storage_service.dart';
 import '../services/service_locator.dart';
@@ -77,6 +73,7 @@ class Product {
       "date_peromp": datePerom,
       "updated_at": updatedAt ?? "",
     };
+
     return map;
   }
 
@@ -132,7 +129,7 @@ class Product {
   }
 
   bool calculeRest() {
-    rest = remain > seuil ? false : true;
+    rest = remain + (free ?? 0) > seuil ? false : true;
     // if (rest == true) {
     //   notification(product);
     // }
@@ -221,6 +218,15 @@ class ProductProvider {
     db = await databaseFactory.openDatabase(path);
     var products = await db
         .rawQuery('''SELECT * from product WHERE produit LIKE '%$str%' ''');
+    await db.close();
+    return List<Product>.from(products.map((e) => Product.fromMap(e)).toList());
+  }
+
+  Future<List<Product>?> searchProductByDate(String str, String path) async {
+    databaseFactory = databaseFactoryFfi;
+    db = await databaseFactory.openDatabase(path);
+    var products = await db
+        .rawQuery('''SELECT * from product WHERE date_achat LIKE '%$str%' ''');
     await db.close();
     return List<Product>.from(products.map((e) => Product.fromMap(e)).toList());
   }
@@ -344,15 +350,4 @@ class ProductDataSource extends m.DataTableSource {
 
   @override
   int get selectedRowCount => 0;
-
-  void sort<T>(Comparable<T> Function(Product d) getField, bool ascending) {
-    list.sort((a, b) {
-      final aValue = getField(a);
-      final bValue = getField(b);
-      return ascending
-          ? Comparable.compare(aValue, bValue)
-          : Comparable.compare(bValue, aValue);
-    });
-    notifyListeners();
-  }
 }

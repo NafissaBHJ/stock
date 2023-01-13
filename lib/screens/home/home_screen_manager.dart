@@ -50,7 +50,6 @@ class HomeManager {
   }
 
   void updateLoginNotifier(bool val) {
-    print(val);
     loggedNotifier.value = val;
     loggedNotifier.notifyListeners;
   }

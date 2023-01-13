@@ -9,6 +9,8 @@ import '../screens/list/list_screen_manager.dart';
 import '../services/service_locator.dart';
 import 'widgets/input_widget.dart';
 
+// ** Dialog helpers for  update and deletion operations
+
 modify(BuildContext context, Product p, ListType type) async {
   var stateManager = getIt<ListManager>();
   return await showDialog<String>(

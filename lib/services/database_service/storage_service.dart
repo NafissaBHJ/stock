@@ -32,4 +32,5 @@ abstract class StorageService {
 
   Future<List<History>?> getHistoryByProduct(int id) async {}
   Future<List<dynamic>?> searchProduct(String name) async {}
+  Future<List<dynamic>?> searchProductByDate(String date) async {}
 }

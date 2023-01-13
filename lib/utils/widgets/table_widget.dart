@@ -99,12 +99,9 @@ class TableWidget extends StatelessWidget {
           DataColumn2(
             label: Text('Date d\'achat'),
           ),
-          DataColumn2(
-              label: Text('Date péremption'),
-              onSort: (columnIndex, ascending) {
-                stateManager.sort(
-                    source, (d) => d.datePerom, columnIndex, ascending);
-              }),
+              DataColumn2(
+            label: Text('Date d\'achat'),
+          ),
           DataColumn2(
             label: Text('Action'),
           ),

@@ -37,7 +37,7 @@ class ProductNotifier extends ValueNotifier<List<Product>> {
 
   Future<void> updateData(int id, Product p) async {
     await _storageService.update(id, p);
-    //  / getData();
+    // getData();
   }
 
   Future<void> deleteData(int id) async {
@@ -47,11 +47,6 @@ class ProductNotifier extends ValueNotifier<List<Product>> {
 
   Future<void> search(String p) async {
     List<Product>? result = [];
-    // value.forEach((element) {
-    //   if (element.product.toLowerCase().contains(p.toLowerCase())) {
-    //     result.add(element);
-    //   }
-    // });
     result = await searchProduct(p);
     if (result != null) {
       value = result;
@@ -60,6 +55,12 @@ class ProductNotifier extends ValueNotifier<List<Product>> {
       value = [];
       notifyListeners();
     }
+  }
+
+  Future<void> searchByDate(String str) async {
+    value =
+        (await _storageService.searchProductByDate(str))?.cast<Product>() ?? [];
+    notifyListeners();
   }
 
   Future<void> updateProductHistory(History h, int id, int pq) async {
@@ -87,8 +88,6 @@ class ProductNotifier extends ValueNotifier<List<Product>> {
 
   Future<List?> getRecordsByUser(String user) async {
     List? l = (await _storageService.getRecordByUser(user))?.toList() ?? [];
-
-    print(l);
     return l;
   }
 

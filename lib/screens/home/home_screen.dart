@@ -24,7 +24,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final loggedin = false;
   @override
   void initState() {
-    // stateManager.getUser();
+   
     stateManager.init();
     super.initState();
   }
@@ -62,13 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                               title: const Text("Stock liste"),
                               body: ListScreen()),
-                          // PaneItem(
-                          //     icon: const Icon(
-                          //       FluentIcons.calendar_agenda,
-                          //       size: 18,
-                          //     ),
-                          //     title: const Text("Daily Stock liste"),
-                          //     body: DailyProductList()),
+                    
                           PaneItem(
                               icon: const Icon(
                                 FluentIcons.add_to_shopping_list,

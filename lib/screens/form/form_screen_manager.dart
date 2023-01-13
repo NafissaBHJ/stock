@@ -64,7 +64,7 @@ class FormManager {
     timePickerNotifier.value = time;
   }
 
-  void InsertProduct(
+  void insertProduct(
       String product,
       String fournisseur,
       String seuil,
@@ -116,7 +116,7 @@ class FormManager {
       String rest,
       String period,
       String free) {
-    // if you modify quantite
+    // if you modify quantite of the day 
     int ttct = 0;
     int qG = 0;
     int rest2 = 0;

@@ -45,8 +45,8 @@ class _FormScreenState extends State<FormScreen> {
   final stateManager = getIt<FormManager>();
 
   int time1 = 1;
-
   int time2 = 2;
+
   @override
   void initState() {
     stateManager.init();
@@ -161,7 +161,7 @@ class _FormScreenState extends State<FormScreen> {
                           input: "Modifier ",
                           controller: controllerReste,
                         )
-                      : SizedBox.shrink(),
+                      :const SizedBox.shrink(),
                   InputNumberWidget(
                     field: "Quantité gratuite",
                     input: "Ajouter la quantité gratuite ",
@@ -174,7 +174,7 @@ class _FormScreenState extends State<FormScreen> {
                     TimePickerWidget(
                       value: "Date Achat",
                       actualTime: p != null ? p!.stringToDateA() : null,
-                      time: time1,
+                      time: time1, // time = 1 for making a diffrence between add and modify
                     ),
                     TimePickerWidget(
                       value: "Date Péromption",
@@ -191,12 +191,12 @@ class _FormScreenState extends State<FormScreen> {
                           height: 30,
                           child: Center(
                               child: p == null
-                                  ? Text("Enregistrer")
-                                  : Text("Modifier"))),
+                                  ? const Text("Enregistrer")
+                                  : const Text("Modifier"))),
                       onPressed: (() {
                         if (_key.currentState!.validate()) {
                           if (p == null) {
-                            stateManager.InsertProduct(
+                            stateManager.insertProduct(
                                 controllerP.text,
                                 controllerF.text,
                                 controllerS.text,
@@ -261,7 +261,7 @@ class InputNumberWidget extends StatelessWidget {
   final String _field;
   final String _input;
   final TextEditingController _controller;
-  bool setTTC;
+  final bool setTTC;
 
   final stateManager = getIt<FormManager>();
   @override

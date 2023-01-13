@@ -1,15 +1,9 @@
-import 'package:data_table_2/data_table_2.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
-import 'package:stock/modals/sort_model.dart';
-import 'package:stock/screens/form/form_screen.dart';
-import 'package:stock/screens/form/form_screen_manager.dart';
 import 'package:stock/screens/list/list_screen_manager.dart';
 import 'package:stock/services/service_locator.dart';
-import 'package:stock/utils/widgets/input_widget.dart';
 
 import '../../modals/data_model.dart';
-import '../../modals/history_model.dart';
 import '../../utils/helpers.dart';
 import '../../utils/widgets/table_widget.dart';
 

@@ -34,13 +34,12 @@ class DatabaseServiceStorage extends StorageService {
   Future<void> open(String path) async {
     db = await databaseFactory.openDatabase(path,
         options: OpenDatabaseOptions(
-          version: 2,
-          onUpgrade: (db, oldVersion, newVersion) async {
-            if (oldVersion < newVersion) {
-              await db.execute('ALTER TABLE product ADD updated_at TEXT NULL');
-            }
-          },
-        ));
+            // onUpgrade: (db, oldVersion, newVersion) async {
+            //   if (oldVersion < newVersion) {
+            //     await db.execute('ALTER TABLE product ADD updated_at TEXT NULL');
+            //   }
+            // },
+            ));
   }
 
   /*
@@ -66,7 +65,10 @@ class DatabaseServiceStorage extends StorageService {
         fusion INTEGER,
         date_achat TEXT,
         date_peromp TEXT,
-        period INTEGER NULL 
+        period INTEGER NULL ,
+        updated_at TEXT NULL
+
+
       )
     ''');
     await db.execute('''
@@ -187,7 +189,7 @@ class DatabaseServiceStorage extends StorageService {
   @override
   Future<List?> getRecordByUser(String str) async {
     List? historyL = await historyProvider.getHistoryByUser(str, _path);
- 
+
     return historyL;
   }
 
@@ -202,6 +204,13 @@ class DatabaseServiceStorage extends StorageService {
   @override
   Future<List?> searchProduct(String name) async {
     List<Product>? productSearch = await _pProvider.search(name, _path);
+    return productSearch;
+  }
+
+  @override
+  Future<List?> searchProductByDate(String date) async {
+    List<Product>? productSearch =
+        await _pProvider.searchProductByDate(date, _path);
     return productSearch;
   }
 
